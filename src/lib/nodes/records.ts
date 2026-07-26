@@ -7,7 +7,7 @@ export function recordsNode(
   const jsonpath = config.jsonpath as string;
   const document = inputs.main;
 
-  const result = jp.query(document as Record<string, unknown>, jsonpath);
+  const result = jp.query(document, jsonpath);
 
   const records = Array.isArray(result) ? result : [result];
   return records;

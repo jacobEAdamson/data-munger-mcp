@@ -6,7 +6,7 @@ export const concatTransform: TransformFn = (_value, record, config) => {
   return values
     .map((v) => {
       if (v.startsWith('$.')) {
-        const result = jp.value(record as Record<string, unknown>, v);
+        const result = jp.value(record, v);
         return result === undefined || result === null ? '' : String(result);
       }
       return v;
