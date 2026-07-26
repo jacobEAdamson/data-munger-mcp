@@ -24,7 +24,7 @@ export function registerTransformValueTool(server: McpServer): void {
         'Run a value through a pipeline of transforms. Useful for testing transform chains or cleaning single values.',
       inputSchema: TransformValueSchema,
     },
-    async (input: unknown) => {
+    (input: unknown) => {
       const parsed = TransformValueSchema.safeParse(input);
       if (!parsed.success) {
         return {
@@ -41,7 +41,7 @@ export function registerTransformValueTool(server: McpServer): void {
       const { value, transforms } = parsed.data;
 
       try {
-        const result = runValuePipeline(transforms, {} as Record<string, unknown>, value);
+        const result = runValuePipeline(transforms, {}, value);
         return {
           content: [
             {

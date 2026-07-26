@@ -10,5 +10,5 @@ function stripDollar(tmpl: string): string {
 
 export const templateTransform: TransformFn = (_value, record, config) => {
   const tmpl = config as string;
-  return engine.parseAndRenderSync(stripDollar(tmpl), record as Record<string, unknown>);
+  return engine.parseAndRenderSync(stripDollar(tmpl), record);
 };
