@@ -2,6 +2,25 @@ import { describe, it, expect } from '@jest/globals';
 import { loadStringNode } from './load_string.js';
 import { groupNode } from './group.js';
 import { joinNode } from './join.js';
+import { templateNode } from './template.js';
+import { outputNode } from './output.js';
+import { normalizeInput } from '../normalize.js';
+import { runGraph } from '../engine.js';
+import { registerAll } from '../register.js';
+import { writeFileSync, mkdirSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
+import { randomUUID } from 'node:crypto';
+
+registerAll();
+
+function tempFile(name: string, content: string): string {
+  const dir = join(tmpdir(), 'data-munger-test-' + randomUUID());
+  mkdirSync(dir, { recursive: true });
+  const path = join(dir, name);
+  writeFileSync(path, content, 'utf-8');
+  return path;
+}
 
 describe('load_string node', () => {
   it('parses JSON string', () => {
@@ -119,5 +138,111 @@ describe('join node', () => {
     const result = joinNode({ on: 'id' }, { left, right });
 
     expect(result).toHaveLength(0);
+  });
+});
+
+describe('template node', () => {
+  it('renders template with records array context', () => {
+    const result = templateNode(
+      { template: 'Team: {{records[0].name}} & {{records[1].name}}' },
+      { main: [{ name: 'Alice', role: 'Dev' }, { name: 'Bob', role: 'QA' }] },
+    );
+    expect(result).toContain('Alice');
+    expect(result).toContain('Bob');
+  });
+
+  it('strips $. prefix from template variables', () => {
+    const result = templateNode(
+      { template: 'Name: {{$.records[0].name}}' },
+      { main: [{ name: 'Charlie' }] },
+    );
+    expect(result).toContain('Charlie');
+  });
+});
+
+describe('output node', () => {
+  it('throws when no format specified for record input', () => {
+    expect(() => outputNode({}, { main: [{ x: 1 }] })).toThrow('format');
+  });
+
+  it('throws on unsupported format', () => {
+    expect(() => outputNode({ format: 'xml' }, { main: [{ x: 1 }] })).toThrow(
+      'Unsupported output format: xml',
+    );
+  });
+
+  it('outputs YAML', () => {
+    const result = outputNode({ format: 'yaml' }, { main: [{ x: 1 }] });
+    expect(result).toContain('x: 1');
+  });
+
+  it('outputs JSON', () => {
+    const result = outputNode({ format: 'json' }, { main: [{ x: 1 }] });
+    expect(result).toContain('"x"');
+  });
+
+  it('passes through string input', () => {
+    const result = outputNode({}, { main: 'hello' });
+    expect(result).toBe('hello');
+  });
+
+  it('writes string output to file', () => {
+    const dir = join(tmpdir(), 'data-munger-test-' + randomUUID());
+    mkdirSync(dir, { recursive: true });
+    const outPath = join(dir, 'out.md');
+    const result = outputNode({ path: outPath }, { main: '# Hello' });
+    expect(result).toContain('Wrote to:');
+  });
+
+  it('writes formatted output to file', () => {
+    const dir = join(tmpdir(), 'data-munger-test-' + randomUUID());
+    mkdirSync(dir, { recursive: true });
+    const outPath = join(dir, 'out.json');
+    const result = outputNode({ format: 'json', path: outPath }, { main: [{ x: 1 }] });
+    expect(result).toContain('Wrote to:');
+  });
+
+  it('handles empty records for markdown', () => {
+    const result = outputNode({ format: 'markdown' }, { main: [] });
+    expect(result).toBe('(no records)');
+  });
+});
+
+describe('load format guessing', () => {
+  it('guesses json from .json extension', async () => {
+    const path = tempFile('data.json', '{"key": "value"}');
+    const nodes = normalizeInput({
+      pipeline: [{ load: { path } }, { output: { format: 'json' } }],
+    });
+    const result = await runGraph(nodes);
+    expect(result.isError).toBe(false);
+  });
+
+  it('guesses csv from .csv extension', async () => {
+    const path = tempFile('data.csv', 'name,age\nAlice,30');
+    const nodes = normalizeInput({
+      pipeline: [{ load: { path } }, { records: { jsonpath: '$[*]' } }, { output: { format: 'json' } }],
+    });
+    const result = await runGraph(nodes);
+    expect(result.isError).toBe(false);
+  });
+
+  it('guesses yaml from .yml extension', async () => {
+    const path = tempFile('data.yml', 'key: value');
+    const nodes = normalizeInput({
+      pipeline: [{ load: { path } }, { output: { format: 'json' } }],
+    });
+    const result = await runGraph(nodes);
+    expect(result.isError).toBe(false);
+  });
+
+  it('throws on unknown extension', async () => {
+    const path = tempFile('data.xyz', 'content');
+    const nodes = normalizeInput({
+      pipeline: [{ load: { path } }, { output: { format: 'json' } }],
+    });
+    const result = await runGraph(nodes);
+    expect(result.isError).toBe(true);
+    expect(result.text).toContain('Cannot guess format');
   });
 });
