@@ -4,6 +4,15 @@
   "description": "MCP server for data munging: load YAML/JSON/CSV, filter with JSONPath, map fields, output as markdown",
   "type": "module",
   "main": "dist/index.js",
+  "bin": {
+    "data-munger-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist/"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
@@ -15,7 +24,8 @@
     "format:check": "prettier --check src/",
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-vm-modules node_modules/.bin/jest",
-    "test:watch": "node --experimental-vm-modules node_modules/.bin/jest --watch"
+    "test:watch": "node --experimental-vm-modules node_modules/.bin/jest --watch",
+    "prepublishOnly": "npm run build && npm test"
   },
   "keywords": [
     "mcp",
@@ -40,6 +50,17 @@
     "verbose": true
   },
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jacobEAdamson/data-munger-mcp.git"
+  },
+  "homepage": "https://github.com/jacobEAdamson/data-munger-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/jacobEAdamson/data-munger-mcp/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@types/jsonpath": "^0.2.4",
