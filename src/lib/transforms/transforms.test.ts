@@ -71,7 +71,7 @@ describe('string transforms', () => {
 });
 
 describe('format transforms', () => {
-  it('format_number', () => {
+  it('format_number with decimals', () => {
     const result = runValuePipeline(
       [{ format_number: { decimals: 2, prefix: '$' } }],
       {},
@@ -80,12 +80,60 @@ describe('format transforms', () => {
     expect(result).toBe('$42.50');
   });
 
+  it('format_number with suffix', () => {
+    const result = runValuePipeline(
+      [{ format_number: { suffix: '%' } }],
+      {},
+      95,
+    );
+    expect(result).toBe('95%');
+  });
+
+  it('format_number without options', () => {
+    const result = runValuePipeline([{ format_number: {} }], {}, 42);
+    expect(result).toBe('42');
+  });
+
+  it('format_date with pattern', () => {
+    const d = new Date('2024-03-15T14:30:00');
+    const result = runValuePipeline(
+      [{ format_date: { output_format: 'YYYY-MM-DD' } }],
+      {},
+      d,
+    );
+    expect(result).toBe('2024-03-15');
+  });
+
+  it('format_date with time', () => {
+    const d = new Date('2024-03-15T14:30:00');
+    const result = runValuePipeline(
+      [{ format_date: { output_format: 'HH:mm:ss' } }],
+      {},
+      d,
+    );
+    expect(result).toBe('14:30:00');
+  });
+
+  it('format_date throws on invalid date', () => {
+    expect(() =>
+      runValuePipeline([{ format_date: { output_format: 'YYYY' } }], {}, 'not-a-date'),
+    ).toThrow('Invalid date');
+  });
+
   it('round', () => {
     expect(runValuePipeline([{ round: { decimals: 1 } }], {}, 3.14159)).toBe(3.1);
   });
 
+  it('round with no decimals', () => {
+    expect(runValuePipeline([{ round: {} }], {}, 3.9)).toBe(4);
+  });
+
   it('truncate', () => {
     expect(runValuePipeline([{ truncate: { length: 5 } }], {}, 'hello world')).toBe('hello…');
+  });
+
+  it('truncate short string', () => {
+    expect(runValuePipeline([{ truncate: { length: 20 } }], {}, 'hi')).toBe('hi');
   });
 });
 

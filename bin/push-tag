@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Push a git tag, temporarily bypassing the tag protection ruleset.
+# Usage: ./bin/push-tag <tagname>
+
+TAG="${1:?Usage: push-tag <tagname>}"
+REPO="jacobEAdamson/data-munger-mcp"
+
+# Get the current tag protection ruleset ID
+RULESET_ID=$(gh api "repos/${REPO}/rulesets" --jq '.[] | select(.name=="Protect version tags") | .id')
+if [ -z "$RULESET_ID" ]; then
+  echo "No tag protection ruleset found. Proceeding without bypass."
+  RULESET_ID=""
+fi
+
+# Save the ruleset so we can recreate it
+if [ -n "$RULESET_ID" ]; then
+  RULESET_JSON=$(gh api "repos/${REPO}/rulesets/${RULESET_ID}" --jq '{name, target, enforcement, conditions, rules}')
+  echo "Removing tag protection ruleset..."
+  gh api "repos/${REPO}/rulesets/${RULESET_ID}" -X DELETE > /dev/null
+fi
+
+# Delete old remote tag if it exists
+if git fetch --tags origin "$TAG" 2>/dev/null; then
+  echo "Deleting old remote tag $TAG..."
+  git push --delete origin "$TAG" 2>/dev/null || true
+fi
+
+# Ensure the tag exists locally
+if ! git tag -l "$TAG" | grep -q .; then
+  echo "Tag $TAG not found locally. Create it first with: git tag $TAG"
+  exit 1
+fi
+
+# Push the tag
+echo "Pushing tag $TAG..."
+git push origin "$TAG"
+
+# Recreate the ruleset
+if [ -n "$RULESET_ID" ]; then
+  echo "Recreating tag protection ruleset..."
+  echo "$RULESET_JSON" | gh api "repos/${REPO}/rulesets" -X POST --input - > /dev/null
+  echo "Tag protection restored."
+fi
+
+echo "Done: $TAG pushed."

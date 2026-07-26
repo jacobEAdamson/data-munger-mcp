@@ -2,7 +2,12 @@
 
 [![npm version](https://img.shields.io/npm/v/data-munger-mcp)](https://www.npmjs.com/package/data-munger-mcp)
 [![CI](https://github.com/jacobEAdamson/data-munger-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/jacobEAdamson/data-munger-mcp/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/jacobEAdamson/data-munger-mcp/branch/master/graph/badge.svg)](https://codecov.io/gh/jacobEAdamson/data-munger-mcp)
+[![codecov](https://codecov.io/gh/jacobEAdamson/data-munger-mcp/graph/badge.svg?token=TWQ85OQOQY)](https://codecov.io/gh/jacobEAdamson/data-munger-mcp)
+[![npm downloads](https://img.shields.io/npm/dm/data-munger-mcp)](https://www.npmjs.com/package/data-munger-mcp)
+[![npm bundle size](https://img.shields.io/bundlephobia/min/data-munger-mcp)](https://bundlephobia.com/package/data-munger-mcp)
+[![Node version](https://img.shields.io/node/v/data-munger-mcp)](https://www.npmjs.com/package/data-munger-mcp)
+[![License](https://img.shields.io/npm/l/data-munger-mcp)](https://github.com/jacobEAdamson/data-munger-mcp/blob/master/LICENSE)
+[![GitHub last commit](https://img.shields.io/github/last-commit/jacobEAdamson/data-munger-mcp)](https://github.com/jacobEAdamson/data-munger-mcp/commits/master)
 
 **Data munging pipelines for Claude Code.** Load, filter, map, join, and transform data — all inside your AI coding session, no context switching.
 

@@ -147,6 +147,25 @@ describe('DAG with join', () => {
   });
 });
 
+describe('engine edge cases', () => {
+  it('handles missing node references gracefully', async () => {
+    const nodes = normalizeInput({
+      nodes: [
+        { id: 'out', output: { from: 'nonexistent', format: 'json' } },
+      ],
+    });
+    const result = await runGraph(nodes);
+    expect(result.isError).toBe(true);
+    expect(result.text).toContain('not found');
+  });
+
+  it('handles empty pipeline', async () => {
+    const nodes = normalizeInput({ pipeline: [] });
+    const result = await runGraph(nodes);
+    expect(result.isError).toBe(true);
+  });
+});
+
 describe('inline data', () => {
   it('loads inline JSON and produces output', async () => {
     const nodes = normalizeInput({
