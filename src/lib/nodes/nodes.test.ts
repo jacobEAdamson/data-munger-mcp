@@ -1,4 +1,4 @@
-import { describe, it, expect, jest } from '@jest/globals';
+import { describe, it, expect } from '@jest/globals';
 import { loadStringNode } from './load_string.js';
 import { groupNode } from './group.js';
 import { joinNode } from './join.js';
@@ -114,7 +114,7 @@ describe('join node', () => {
 
   it('defaults to inner join', () => {
     const left = [{ id: 1, name: 'Alice' }];
-    const right: Array<Record<string, unknown>> = [];
+    const right: Record<string, unknown>[] = [];
 
     const result = joinNode({ on: 'id' }, { left, right });
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from '@jest/globals';
-import { registerAllTransforms, runValuePipeline } from '../transforms/index.js';
+import { runValuePipeline } from '../transforms/index.js';
 import { registerAll } from '../register.js';
 
 registerAll();
