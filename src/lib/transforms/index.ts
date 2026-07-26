@@ -12,6 +12,14 @@ import {
   roundTransform,
   truncateTransform,
 } from './format.js';
+import {
+  base64EncodeTransform,
+  base64DecodeTransform,
+  urlEncodeTransform,
+  urlDecodeTransform,
+  htmlEscapeTransform,
+  htmlUnescapeTransform,
+} from './encode.js';
 
 export { runValuePipeline } from './registry.js';
 
@@ -31,4 +39,10 @@ export function registerAllTransforms(): void {
   registerTransform('format_date', formatDateTransform);
   registerTransform('round', roundTransform);
   registerTransform('truncate', truncateTransform);
+  registerTransform('base64_encode', base64EncodeTransform);
+  registerTransform('base64_decode', base64DecodeTransform);
+  registerTransform('url_encode', urlEncodeTransform);
+  registerTransform('url_decode', urlDecodeTransform);
+  registerTransform('html_escape', htmlEscapeTransform);
+  registerTransform('html_unescape', htmlUnescapeTransform);
 }
