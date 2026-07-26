@@ -100,7 +100,11 @@ export type ValueTransformType =
   | 'format_number'
   | 'format_date'
   | 'round'
-  | 'truncate';
+  | 'truncate'
+  | 'date_add'
+  | 'date_diff'
+  | 'date_truncate'
+  | 'date_tz';
 
 /** A single step in a value pipeline. Either a string (no-config transform) or {type, config}. */
 export type ValueTransform =
@@ -115,16 +119,24 @@ export type ValueTransform =
       | 'round'
       | 'truncate'
       | 'to_date'
+      | 'date_add'
+      | 'date_diff'
+      | 'date_truncate'
+      | 'date_tz'
     >
   | { jsonpath: string }
   | { concat: { values: string[] } }
   | { template: string }
   | { regex: { pattern: string; replace: string } }
   | { format_number: { decimals?: number; prefix?: string; suffix?: string } }
-  | { format_date: { output_format: string } }
+  | { format_date: { output_format: string; timezone?: string } }
   | { round: { decimals?: number } }
   | { truncate: { length: number } }
-  | { to_date: { input_format?: string } };
+  | { to_date: { input_format?: string; timezone?: string } }
+  | { date_add: { years?: number; months?: number; weeks?: number; days?: number; hours?: number; minutes?: number; seconds?: number; timezone?: string } }
+  | { date_diff: { unit: 'years' | 'months' | 'weeks' | 'days' | 'hours' | 'minutes' | 'seconds'; to?: string } }
+  | { date_truncate: { unit: string; timezone?: string } }
+  | { date_tz: { target: string; source?: string } };
 
 // ─── Pipeline / Graph input shapes ───────────────────────────────────
 

@@ -43,6 +43,10 @@ claude mcp add data-munger-mcp -- npx -y data-munger-mcp
 }
 ```
 
+If data-munger-mcp saves you time, consider [buying me a coffee](https://ko-fi.com/F1F2TW10N) (or a steak!).
+
+<a href='https://ko-fi.com/F1F2TW10N' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi4.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+
 ## Tools
 
 ### `munge` — pipeline mode
@@ -83,12 +87,17 @@ Transforms work in `map` fields AND in `transform_value`. Chain them together �
 | `to_number` | — | | Parse numeric string |
 | `to_string` | — | | Stringify value |
 | `format_number` | `{decimals, prefix, suffix}` | | Number formatting |
-| `format_date` | `{output_format}` | | Date formatting |
+| `format_date` | `{output_format, timezone?}` | | Date formatting (date-fns tokens) |
 | `round` | `{decimals?}` | | Round number |
 | `truncate` | `{length}` | | Truncate string |
 | `base64_encode` / `base64_decode` | — | | Encode/decode Base64 |
 | `url_encode` / `url_decode` | — | | Encode/decode URI components |
 | `html_escape` / `html_unescape` | — | | Escape/unescape HTML entities |
+| `to_date` | `{input_format?, timezone?}` | | Parse date string (date-fns parse) |
+| `date_add` | `{years?, months?, weeks?, days?, hours?, minutes?, seconds?, timezone?}` | | Add/subtract duration from date |
+| `date_diff` | `{unit, to?}` | | Difference between two dates |
+| `date_truncate` | `{unit, timezone?}` | | Truncate date to unit (start of month, etc.) |
+| `date_tz` | `{target, source?}` | | Convert between timezones |
 
 ## Examples
 

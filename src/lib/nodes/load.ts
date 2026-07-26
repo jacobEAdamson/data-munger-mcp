@@ -1,5 +1,15 @@
 import { readFile } from 'node:fs/promises';
 import { load as yamlLoad } from 'js-yaml';
+import type { NodeMeta } from '../engine.js';
+
+export const nodeMeta: NodeMeta = {
+  description: 'Load a file from disk (YAML, JSON, or CSV). Produces a parsed document.',
+  inputSlots: [],
+  config: {
+    path: { type: 'string', required: true, description: 'Path to the file on disk' },
+    format: { type: 'yaml | json | csv', required: false, description: 'Override format detection from extension' },
+  },
+};
 
 export async function loadNode(
   config: Record<string, unknown>,

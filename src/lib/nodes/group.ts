@@ -1,3 +1,18 @@
+import type { NodeMeta } from '../engine.js';
+
+export const nodeMeta: NodeMeta = {
+  description: 'Group records by a field and compute aggregations (sum, count, avg, min, max).',
+  inputSlots: [{ name: 'main', description: 'Array of records' }],
+  config: {
+    by: { type: 'string', required: true, description: 'Field name to group by' },
+    agg: {
+      type: '{ field, op, as? }[]',
+      required: true,
+      description: 'Array of aggregations: field to aggregate, op (sum/count/avg/min/max), optional output name (as)',
+    },
+  },
+};
+
 export function groupNode(
   config: Record<string, unknown>,
   inputs: Record<string, unknown>,

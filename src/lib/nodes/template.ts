@@ -1,4 +1,13 @@
 import { Liquid } from 'liquidjs';
+import type { NodeMeta } from '../engine.js';
+
+export const nodeMeta: NodeMeta = {
+  description: 'Render records through a Liquid template. Produces a string.',
+  inputSlots: [{ name: 'main', description: 'Array of records' }],
+  config: {
+    template: { type: 'string', required: true, description: 'Liquid template string. Use {{ field_name }} for record fields.' },
+  },
+};
 
 const engine = new Liquid();
 

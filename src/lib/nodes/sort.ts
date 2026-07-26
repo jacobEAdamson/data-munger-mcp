@@ -1,3 +1,14 @@
+import type { NodeMeta } from '../engine.js';
+
+export const nodeMeta: NodeMeta = {
+  description: 'Sort an array of records by a field name.',
+  inputSlots: [{ name: 'main', description: 'Array of records' }],
+  config: {
+    by: { type: 'string', required: true, description: 'Field name to sort by' },
+    desc: { type: 'boolean', required: false, description: 'Sort descending (default: ascending)' },
+  },
+};
+
 export function sortNode(
   config: Record<string, unknown>,
   inputs: Record<string, unknown>,

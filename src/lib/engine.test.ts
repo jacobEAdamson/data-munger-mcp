@@ -1,6 +1,6 @@
 import { describe, it, expect } from '@jest/globals';
 import { normalizeInput } from './normalize.js';
-import { runGraph } from './engine.js';
+import { runGraph, getAllNodeMetas } from './engine.js';
 import { registerAll } from './register.js';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -271,5 +271,39 @@ describe('graph mode', () => {
     expect(result.isError).toBe(false);
     const parsed = JSON.parse(result.text) as Record<string, string>[];
     expect(parsed).toEqual([{ N: '1' }, { N: '2' }]);
+  });
+});
+
+describe('node metadata', () => {
+  it('all 10 nodes have metadata', () => {
+    const metas = getAllNodeMetas();
+    expect(metas.length).toBe(10);
+  });
+
+  it('each node has description and config', () => {
+    const metas = getAllNodeMetas();
+    for (const { meta } of metas) {
+      expect(meta.description).toBeTruthy();
+      expect(Object.keys(meta.config).length).toBeGreaterThan(0);
+    }
+  });
+
+  it('join node has left/right slots', () => {
+    const metas = getAllNodeMetas();
+    const join = metas.find((m) => m.name === 'join');
+    if (join) {
+      expect(join.meta.inputSlots.map((s) => s.name)).toEqual(['left', 'right']);
+    } else {
+      throw new Error('join not found');
+    }
+  });
+
+  it('source nodes have empty inputSlots', () => {
+    const metas = getAllNodeMetas();
+    for (const { name, meta } of metas) {
+      if (name === 'load' || name === 'load_string') {
+        expect(meta.inputSlots.length).toBe(0);
+      }
+    }
   });
 });
