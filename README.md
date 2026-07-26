@@ -2,6 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/data-munger-mcp)](https://www.npmjs.com/package/data-munger-mcp)
 [![CI](https://github.com/jacobEAdamson/data-munger-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/jacobEAdamson/data-munger-mcp/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/jacobEAdamson/data-munger-mcp/branch/master/graph/badge.svg)](https://codecov.io/gh/jacobEAdamson/data-munger-mcp)
 
 **Data munging pipelines for Claude Code.** Load, filter, map, join, and transform data — all inside your AI coding session, no context switching.
 
