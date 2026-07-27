@@ -38,14 +38,14 @@ export interface SchemaResult {
   summary: string;
 }
 
-function guessFormat(path: string): string {
+export function guessFormat(path: string): string {
   if (path.endsWith('.yaml') || path.endsWith('.yml')) return 'yaml';
   if (path.endsWith('.json')) return 'json';
   if (path.endsWith('.csv')) return 'csv';
   throw new Error(`Cannot guess format from path: ${path}`);
 }
 
-function loadFile(path: string, format?: string): unknown {
+export function loadFile(path: string, format?: string): unknown {
   const fmt = format ?? guessFormat(path);
   const raw = readFileSync(path, 'utf-8');
 

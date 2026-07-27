@@ -1,8 +1,12 @@
 import { describe, it, expect } from '@jest/globals';
+import { writeFileSync, mkdirSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
+import { randomUUID } from 'node:crypto';
 import { registerAll } from '../lib/register.js';
 import { getAllTransformMetas } from '../lib/transforms/registry.js';
 import { getAllNodeMetas } from '../lib/engine.js';
-import { describeValue } from './describe-data.js';
+import { describeValue, guessFormat, loadFile } from './describe-data.js';
 
 registerAll();
 
@@ -99,5 +103,94 @@ describe('describe_data', () => {
   it('describes ISO date string', () => {
     const result = describeValue('2024-01-15T00:00:00Z');
     expect(result.type).toBe('date (string)');
+  });
+
+  it('describes primitive array', () => {
+    const result = describeValue(['a', 'b', 'c']);
+    expect(result.type).toBe('string[]');
+    expect(result.count).toBe(3);
+  });
+
+  it('describes mixed-type array', () => {
+    const result = describeValue([1, 'two', true]);
+    expect(result.type).toContain('|');
+    expect(result.count).toBe(3);
+  });
+
+  it('describes empty array inside object', () => {
+    const result = describeValue({ items: [] });
+    expect(result.type).toBe('object');
+    if (result.fields) {
+      const items = result.fields.find((f) => f.name === 'items');
+      expect(items?.type).toBe('array');
+    }
+  });
+
+  it('describes primitive array inside object', () => {
+    const result = describeValue({ tags: ['a', 'b', 'c'] });
+    expect(result.type).toBe('object');
+    if (result.fields) {
+      const tags = result.fields.find((f) => f.name === 'tags');
+      expect(tags?.type).toContain('string[]');
+      expect(tags?.count).toBe(3);
+    }
+  });
+
+  it('handles max depth', () => {
+    const deep = { a: { b: { c: { d: { e: { f: { g: 'deep' } } } } } } };
+    const result = describeValue(deep, 0, 2);
+    expect(result.type).toBe('object');
+  });
+});
+
+describe('loadFile', () => {
+  function tempFile(name: string, content: string): string {
+    const dir = join(tmpdir(), 'data-munger-test-' + randomUUID());
+    mkdirSync(dir, { recursive: true });
+    const path = join(dir, name);
+    writeFileSync(path, content, 'utf-8');
+    return path;
+  }
+
+  it('loads JSON file', () => {
+    const path = tempFile('test.json', '{"name": "Alice"}');
+    const result = loadFile(path);
+    expect(result).toEqual({ name: 'Alice' });
+  });
+
+  it('loads YAML file', () => {
+    const path = tempFile('test.yaml', 'name: Bob\nage: 30\n');
+    const result = loadFile(path, 'yaml');
+    expect(result).toEqual({ name: 'Bob', age: 30 });
+  });
+
+  it('loads CSV file', () => {
+    const path = tempFile('test.csv', 'name,age\nAlice,30\nBob,25');
+    const result = loadFile(path);
+    expect(result).toEqual([{ name: 'Alice', age: '30' }, { name: 'Bob', age: '25' }]);
+  });
+
+  it('throws on unsupported format', () => {
+    const path = tempFile('test.json', '{}');
+    expect(() => loadFile(path, 'xml')).toThrow('Unsupported format');
+  });
+});
+
+describe('guessFormat', () => {
+  it('detects yaml', () => {
+    expect(guessFormat('data.yaml')).toBe('yaml');
+    expect(guessFormat('data.yml')).toBe('yaml');
+  });
+
+  it('detects json', () => {
+    expect(guessFormat('data.json')).toBe('json');
+  });
+
+  it('detects csv', () => {
+    expect(guessFormat('data.csv')).toBe('csv');
+  });
+
+  it('throws on unknown extension', () => {
+    expect(() => guessFormat('data.txt')).toThrow('Cannot guess format');
   });
 });

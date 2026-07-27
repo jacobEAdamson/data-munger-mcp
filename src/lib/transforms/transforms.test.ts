@@ -421,4 +421,14 @@ describe('date branches', () => {
       ),
     ).toThrow('cannot resolve');
   });
+
+  it('date_add with timezone', () => {
+    const d = new Date('2024-03-15T18:00:00Z');
+    const result = runValuePipeline(
+      [{ date_add: { days: 1, timezone: 'America/New_York' } }],
+      {},
+      d,
+    ) as Date;
+    expect(result).toBeInstanceOf(Date);
+  });
 });
