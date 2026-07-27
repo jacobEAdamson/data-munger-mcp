@@ -1,4 +1,14 @@
 import { load as yamlLoad } from 'js-yaml';
+import type { NodeMeta } from '../engine.js';
+
+export const nodeMeta: NodeMeta = {
+  description: 'Parse inline data string (YAML, JSON, or CSV). Produces a parsed document.',
+  inputSlots: [],
+  config: {
+    data: { type: 'string', required: true, description: 'Inline data string' },
+    format: { type: 'yaml | json | csv', required: false, description: 'Override format detection' },
+  },
+};
 
 export function loadStringNode(
   config: Record<string, unknown>,

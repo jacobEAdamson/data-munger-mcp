@@ -1,4 +1,18 @@
 import { runValuePipeline } from '../transforms/registry.js';
+import type { NodeMeta } from '../engine.js';
+
+export const nodeMeta: NodeMeta = {
+  description: 'Transform each record in an array by mapping fields through value pipelines. Each field value is an array of value transforms.',
+  inputSlots: [{ name: 'main', description: 'Array of records from records node' }],
+  config: {
+    fields: {
+      type: '{ label: string, value: transform[] }[]',
+      required: true,
+      description: 'Array of field definitions. Each field has a label and a value pipeline (array of transform steps). Use describe_transforms to see available transforms.',
+    },
+  },
+  note: 'The value property of each field is an array of transforms — see describe_transforms for available transforms.',
+};
 
 export function mapNode(
   config: Record<string, unknown>,

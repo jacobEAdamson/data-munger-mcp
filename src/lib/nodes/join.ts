@@ -1,3 +1,18 @@
+import type { NodeMeta } from '../engine.js';
+
+export const nodeMeta: NodeMeta = {
+  description: 'Join two record arrays on a common field (inner, left, or right join). Requires two upstream nodes.',
+  inputSlots: [
+    { name: 'left', description: 'Left array of records' },
+    { name: 'right', description: 'Right array of records' },
+  ],
+  config: {
+    inputs: { type: '{ left: string, right: string }', required: true, description: 'Node IDs for left and right inputs. Only used in munge_graph DAG mode.' },
+    on: { type: 'string', required: true, description: 'Field name to join on (must exist in both arrays)' },
+    type: { type: 'inner | left | right', required: false, description: 'Join type (default: inner)' },
+  },
+};
+
 export function joinNode(
   config: Record<string, unknown>,
   inputs: Record<string, unknown>,

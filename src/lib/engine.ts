@@ -1,11 +1,36 @@
 import type { InternalNode, NodeHandler, NodeResult } from './types.js';
 
-// ─── Registry ────────────────────────────────────────────────────────
+// ─── Node handler registry ───────────────────────────────────────────
 
 const handlers = new Map<string, NodeHandler>();
 
 export function registerNodeHandler(type: string, handler: NodeHandler): void {
   handlers.set(type, handler);
+}
+
+// ─── Node metadata registry (for describe_pipeline) ──────────────────
+
+export interface NodeMeta {
+  description: string;
+  inputSlots: { name: string; description: string }[];
+  config: Record<string, { type: string; required?: boolean; description: string }>;
+  note?: string;
+}
+
+const nodeMetaRegistry = new Map<string, NodeMeta>();
+
+export function registerNodeMeta(type: string, meta: NodeMeta): void {
+  nodeMetaRegistry.set(type, meta);
+}
+
+export function getAllNodeMetas(): { name: string; meta: NodeMeta }[] {
+  const result: { name: string; meta: NodeMeta }[] = [];
+  for (const name of nodeMetaRegistry.keys()) {
+    const meta = nodeMetaRegistry.get(name);
+    if (meta) result.push({ name, meta });
+  }
+  result.sort((a, b) => a.name.localeCompare(b.name));
+  return result;
 }
 
 // ─── Error ───────────────────────────────────────────────────────────

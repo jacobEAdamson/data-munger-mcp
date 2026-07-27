@@ -9,6 +9,9 @@ import { registerAll } from './lib/register.js';
 import { registerMungeTool } from './tools/munge.js';
 import { registerMungeGraphTool } from './tools/munge-graph.js';
 import { registerTransformValueTool } from './tools/transform-value.js';
+import { registerDescribeTransformsTool } from './tools/describe-transforms.js';
+import { registerDescribePipelineTool } from './tools/describe-pipeline.js';
+import { registerDescribeDataTool } from './tools/describe-data.js';
 
 // Register all node handlers and value transforms
 registerAll();
@@ -32,6 +35,9 @@ const server = new McpServer(
 registerMungeTool(server);
 registerMungeGraphTool(server);
 registerTransformValueTool(server);
+registerDescribeTransformsTool(server);
+registerDescribePipelineTool(server);
+registerDescribeDataTool(server);
 
 const transport = new StdioServerTransport();
 await server.connect(transport);

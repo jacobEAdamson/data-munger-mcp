@@ -1,4 +1,32 @@
-import type { TransformFn } from './registry.js';
+import { format } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
+import type { TransformFn, TransformMeta } from './registry.js';
+
+export const transformMeta: Record<string, TransformMeta> = {
+  format_number: {
+    description: 'Format number with decimals, prefix, and suffix',
+    configShape: {
+      decimals: { type: 'number', required: false, description: 'Number of decimal places' },
+      prefix: { type: 'string', required: false, description: 'Text prepended (e.g. "$")' },
+      suffix: { type: 'string', required: false, description: 'Text appended (e.g. "%")' },
+    },
+  },
+  format_date: {
+    description: 'Format Date to string using date-fns format tokens',
+    configShape: {
+      output_format: { type: 'string', required: true, description: 'date-fns format string (e.g. "yyyy-MM-dd", "MMMM do, yyyy")' },
+      timezone: { type: 'string', required: false, description: 'IANA timezone (e.g. "America/New_York")' },
+    },
+  },
+  round: {
+    description: 'Round number to specified decimals',
+    configShape: { decimals: { type: 'number', required: false, description: 'Decimal places (default 0)' } },
+  },
+  truncate: {
+    description: 'Truncate string to length, appending ellipsis',
+    configShape: { length: { type: 'number', required: true, description: 'Max characters before truncation' } },
+  },
+};
 
 export const formatNumberTransform: TransformFn = (value, _record, config) => {
   const { decimals, prefix, suffix } = config as {
@@ -14,21 +42,14 @@ export const formatNumberTransform: TransformFn = (value, _record, config) => {
 };
 
 export const formatDateTransform: TransformFn = (value, _record, config) => {
-  const { output_format } = config as { output_format: string };
+  const { output_format, timezone } = config as { output_format: string; timezone?: string };
   const d = value instanceof Date ? value : new Date(String(value));
   if (isNaN(d.getTime())) throw new Error(`Invalid date: ${String(value)}`);
 
-  const pad = (n: number): string => String(n).padStart(2, '0');
-  const map: Record<string, string> = {
-    YYYY: String(d.getFullYear()),
-    MM: pad(d.getMonth() + 1),
-    DD: pad(d.getDate()),
-    HH: pad(d.getHours()),
-    mm: pad(d.getMinutes()),
-    ss: pad(d.getSeconds()),
-  };
-
-  return output_format.replace(/YYYY|MM|DD|HH|mm|ss/g, (k) => map[k] ?? k);
+  if (timezone) {
+    return formatInTimeZone(d, timezone, output_format);
+  }
+  return format(d, output_format);
 };
 
 export const roundTransform: TransformFn = (value, _record, config) => {

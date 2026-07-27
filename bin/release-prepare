@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Prepare a release: bump version, update changelog, open PR.
+# Usage: ./bin/release-prepare <patch|minor|major|"x.y.z">
+
+BUMP="${1:?Usage: release-prepare <patch|minor|major|x.y.z>}"
+REPO="jacobEAdamson/data-munger-mcp"
+
+# ─── Sanity checks ─────────────────────────────────────────────────────
+
+if [ -n "$(git status --porcelain)" ]; then
+  echo "Working tree has uncommitted changes. Commit or stash first."
+  exit 1
+fi
+
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+if [ "$BRANCH" != "master" ]; then
+  echo "Not on master. Currently on '$BRANCH'."
+  exit 1
+fi
+
+# ─── Bump version ──────────────────────────────────────────────────────
+
+# Validate the bump argument
+if [[ "$BUMP" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  # Explicit version
+  npm version "$BUMP" --no-git-tag-version --allow-same-version 2>/dev/null || {
+    echo "Invalid version: $BUMP"
+    exit 1
+  }
+  VERSION="$BUMP"
+else
+  case "$BUMP" in
+    patch|minor|major) ;;
+    *) echo "Usage: release-prepare <patch|minor|major|x.y.z>"; exit 1 ;;
+  esac
+  npm version "$BUMP" --no-git-tag-version
+  VERSION=$(node -p "require('./package.json').version")
+fi
+
+echo "Bumped to v$VERSION"
+
+# ─── Create branch ─────────────────────────────────────────────────────
+
+BRANCH_NAME="release/v$VERSION"
+if git rev-parse --verify "$BRANCH_NAME" 2>/dev/null; then
+  echo "Branch '$BRANCH_NAME' already exists. Delete it first."
+  exit 1
+fi
+git checkout -b "$BRANCH_NAME"
+
+# ─── Update CHANGELOG ──────────────────────────────────────────────────
+
+DATE=$(date +%Y-%m-%d)
+TMPFILE=$(mktemp)
+
+# Read existing changelog
+EXISTING=$(cat CHANGELOG.md)
+
+# Insert new entry at the top (after the title and intro lines)
+HEADER=$(echo "$EXISTING" | head -7)
+BODY=$(echo "$EXISTING" | tail -n +8)
+
+cat > "$TMPFILE" <<EOF
+$HEADER
+
+## [$VERSION] - $DATE
+
+EOF
+
+# Try to open editor for release notes
+if [ -n "${EDITOR:-}" ]; then
+  # Write placeholder
+  cat >> "$TMPFILE" <<EOF
+### Added
+-
+
+### Changed
+-
+
+### Fixed
+-
+
+EOF
+  # Append existing body
+  echo "$BODY" >> "$TMPFILE"
+
+  "$EDITOR" "$TMPFILE"
+
+  # Remove empty sections after editing
+  if grep -q '^### Added$' "$TMPFILE" && ! grep -A1 '^### Added$' "$TMPFILE" | grep -q '^- '; then
+    # Remove empty Added section
+    sed -i '/^### Added$/,/^### /{/^### /!d; /^### Added$/d}' "$TMPFILE"
+  fi
+  if grep -q '^### Changed$' "$TMPFILE" && ! grep -A1 '^### Changed$' "$TMPFILE" | grep -q '^- '; then
+    sed -i '/^### Changed$/,/^### /{/^### /!d; /^### Changed$/d}' "$TMPFILE"
+  fi
+  if grep -q '^### Fixed$' "$TMPFILE" && ! grep -A1 '^### Fixed$' "$TMPFILE" | grep -q '^- '; then
+    sed -i '/^### Fixed$/,/^### /{/^### /!d; /^### Fixed$/d}' "$TMPFILE"
+  fi
+else
+  # No editor — write placeholder
+  cat >> "$TMPFILE" <<EOF
+### Added
+- (describe your changes)
+
+EOF
+  echo "$BODY" >> "$TMPFILE"
+  echo "No EDITOR set. Fill in CHANGELOG.md manually before committing."
+fi
+
+mv "$TMPFILE" CHANGELOG.md
+
+# ─── Commit and push ───────────────────────────────────────────────────
+
+git add -A
+git commit -m "release: v$VERSION"
+git push origin "$BRANCH_NAME"
+
+# ─── Open PR ───────────────────────────────────────────────────────────
+
+gh pr create \
+  --repo "$REPO" \
+  --title "Release v$VERSION" \
+  --body "Changelog entry + version bump." \
+  --base master \
+  --head "$BRANCH_NAME"
+
+echo "Release PR for v$VERSION opened."

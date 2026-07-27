@@ -1,6 +1,16 @@
 import { dump as yamlDump } from 'js-yaml';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
+import type { NodeMeta } from '../engine.js';
+
+export const nodeMeta: NodeMeta = {
+  description: 'Format the result as markdown, JSON, or YAML. Optionally write to a file. End of pipeline.',
+  inputSlots: [{ name: 'main', description: 'Any value (records, string, document)' }],
+  config: {
+    format: { type: 'markdown | json | yaml', required: false, description: 'Output format (default: markdown)' },
+    path: { type: 'string', required: false, description: 'Optional file path to write output to' },
+  },
+};
 
 export function outputNode(
   config: Record<string, unknown>,
