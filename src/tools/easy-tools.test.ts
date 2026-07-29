@@ -7,8 +7,8 @@ import { registerAll } from '../lib/register.js';
 import { normalizeInput } from '../lib/normalize.js';
 import { runGraph } from '../lib/engine.js';
 import { runValuePipeline } from '../lib/transforms/registry.js';
-import { buildEasyMungePipeline } from './easy-munge.js';
-import { formatResult, resolveConvertValue } from './easy-convert.js';
+import { buildEasyMungePipeline, handleEasyMunge } from './easy-munge.js';
+import { formatResult, resolveConvertValue, handleEasyConvert } from './easy-convert.js';
 
 registerAll();
 
@@ -375,5 +375,95 @@ describe('easy_convert', () => {
     it('throws on unknown transform', () => {
       expect(() => runValuePipeline(['nonexistent'], {}, 'test')).toThrow('Unknown transform');
     });
+  });
+
+  describe('handleEasyConvert handler', () => {
+    it('returns error for invalid input', async () => {
+      const result = await handleEasyConvert({ bogus: true });
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('Invalid input');
+    });
+
+    it('returns error when both value and path are missing', async () => {
+      const result = await handleEasyConvert({ transform: 'base64_encode' });
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toBe('Provide either "value" (inline) or "path" (file to read).');
+    });
+
+    it('transforms inline value', async () => {
+      const result = await handleEasyConvert({ value: 'hello', transform: 'base64_encode' });
+      expect(result.isError).toBeFalsy();
+      expect(result.content[0].text).toBe('aGVsbG8=');
+    });
+
+    it('transforms file contents', async () => {
+      const path = tempFile('data.txt', 'hello world');
+      const result = await handleEasyConvert({ path, transform: 'base64_encode' });
+      expect(result.isError).toBeFalsy();
+      expect(result.content[0].text).toBe('aGVsbG8gd29ybGQ=');
+    });
+
+    it('writes output to file when outputPath provided', async () => {
+      const outDir = join(tmpdir(), 'data-munger-test-' + randomUUID());
+      mkdirSync(outDir, { recursive: true });
+      const outPath = join(outDir, 'out.txt');
+      const result = await handleEasyConvert({ value: 'hi', transform: 'base64_encode', outputPath: outPath });
+      expect(result.isError).toBeFalsy();
+      // Verify file was written
+      const { readFile } = await import('node:fs/promises');
+      const written = await readFile(outPath, 'utf-8');
+      expect(written).toBe('aGk=');
+    });
+
+    it('returns error on invalid transform', async () => {
+      const result = await handleEasyConvert({ value: 'test', transform: 'nonexistent' });
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('Unknown transform');
+    });
+  });
+});
+
+// ─── easy_munge handler tests ──────────────────────────────────────────
+
+describe('handleEasyMunge handler', () => {
+  it('returns error for invalid input', async () => {
+    const result = await handleEasyMunge({ bogus: true });
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('Invalid input');
+  });
+
+  it('returns error for missing fields', async () => {
+    const result = await handleEasyMunge({
+      path: '/some/file.yaml',
+      jsonpath: '$.items[*]',
+      fields: [],
+      output: 'markdown',
+    });
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('Invalid input');
+  });
+
+  it('runs a successful pipeline', async () => {
+    const path = tempFile('data.yaml', 'items:\n  - name: Alice\n  - name: Bob\n');
+    const result = await handleEasyMunge({
+      path,
+      jsonpath: '$.items[*]',
+      fields: ['name'],
+      output: 'markdown',
+    });
+    expect(result.isError).toBeFalsy();
+    expect(result.content[0].text).toContain('Alice');
+    expect(result.content[0].text).toContain('Bob');
+  });
+
+  it('handles pipeline errors', async () => {
+    const result = await handleEasyMunge({
+      path: '/nonexistent/file.yaml',
+      jsonpath: '$.items[*]',
+      fields: ['name'],
+      output: 'markdown',
+    });
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('ENOENT');
   });
 });

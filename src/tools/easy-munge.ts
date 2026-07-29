@@ -64,6 +64,32 @@ export function buildEasyMungePipeline(params: {
   return pipeline;
 }
 
+/** Handle an easy_munge tool call. Exported for testing. */
+export async function handleEasyMunge(input: unknown): Promise<{ content: { type: string; text: string }[]; isError?: boolean }> {
+  const parsed = EasyMungeSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      content: [{ type: 'text', text: `Invalid input: ${parsed.error.message}` }],
+      isError: true,
+    };
+  }
+
+  try {
+    const pipeline = buildEasyMungePipeline(parsed.data);
+    const nodes = normalizeInput({ pipeline });
+    const result = await runGraph(nodes);
+    return {
+      content: [{ type: 'text', text: result.text }],
+      isError: result.isError,
+    };
+  } catch (err) {
+    return {
+      content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }],
+      isError: true,
+    };
+  }
+}
+
 export function registerEasyMungeTool(server: McpServer): void {
   server.registerTool(
     'easy_munge',
@@ -73,29 +99,6 @@ export function registerEasyMungeTool(server: McpServer): void {
         'Load a file, extract records, pick fields, and output a table. A simplified wrapper around the full munge pipeline — no pipeline syntax needed.',
       inputSchema: EasyMungeSchema,
     },
-    async (input: unknown) => {
-      const parsed = EasyMungeSchema.safeParse(input);
-      if (!parsed.success) {
-        return {
-          content: [{ type: 'text', text: `Invalid input: ${parsed.error.message}` }],
-          isError: true,
-        };
-      }
-
-      try {
-        const pipeline = buildEasyMungePipeline(parsed.data);
-        const nodes = normalizeInput({ pipeline });
-        const result = await runGraph(nodes);
-        return {
-          content: [{ type: 'text', text: result.text }],
-          isError: result.isError,
-        };
-      } catch (err) {
-        return {
-          content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }],
-          isError: true,
-        };
-      }
-    },
+    handleEasyMunge,
   );
 }

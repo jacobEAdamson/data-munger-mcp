@@ -29,6 +29,45 @@ export async function resolveConvertValue(
   return value;
 }
 
+/** Handle an easy_convert tool call. Exported for testing. */
+export async function handleEasyConvert(input: unknown): Promise<{ content: { type: string; text: string }[]; isError?: boolean }> {
+  const parsed = EasyConvertSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      content: [{ type: 'text', text: `Invalid input: ${parsed.error.message}` }],
+      isError: true,
+    };
+  }
+
+  const { value, path, transform, outputPath } = parsed.data;
+
+  if (value === undefined && !path) {
+    return {
+      content: [{ type: 'text', text: 'Provide either "value" (inline) or "path" (file to read).' }],
+      isError: true,
+    };
+  }
+
+  try {
+    const resolvedValue = await resolveConvertValue(value, path);
+    const result = runValuePipeline([transform], {}, resolvedValue);
+
+    // Write to file if requested
+    if (outputPath) {
+      await writeFile(outputPath, formatResult(result), 'utf-8');
+    }
+
+    return {
+      content: [{ type: 'text', text: formatResult(result) }],
+    };
+  } catch (err) {
+    return {
+      content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }],
+      isError: true,
+    };
+  }
+}
+
 export function registerEasyConvertTool(server: McpServer): void {
   server.registerTool(
     'easy_convert',
@@ -38,42 +77,6 @@ export function registerEasyConvertTool(server: McpServer): void {
         'Apply a single transform to a value or file contents. Simpler than transform_value — just one transform at a time, with optional file read/write.',
       inputSchema: EasyConvertSchema,
     },
-    async (input: unknown) => {
-      const parsed = EasyConvertSchema.safeParse(input);
-      if (!parsed.success) {
-        return {
-          content: [{ type: 'text', text: `Invalid input: ${parsed.error.message}` }],
-          isError: true,
-        };
-      }
-
-      const { value, path, transform, outputPath } = parsed.data;
-
-      if (value === undefined && !path) {
-        return {
-          content: [{ type: 'text', text: 'Provide either "value" (inline) or "path" (file to read).' }],
-          isError: true,
-        };
-      }
-
-      try {
-        const resolvedValue = await resolveConvertValue(value, path);
-        const result = runValuePipeline([transform], {}, resolvedValue);
-
-        // Write to file if requested
-        if (outputPath) {
-          await writeFile(outputPath, formatResult(result), 'utf-8');
-        }
-
-        return {
-          content: [{ type: 'text', text: formatResult(result) }],
-        };
-      } catch (err) {
-        return {
-          content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }],
-          isError: true,
-        };
-      }
-    },
+    handleEasyConvert,
   );
 }
