@@ -192,3 +192,12 @@ export type NodeHandler = (
 // ─── Output format ───────────────────────────────────────────────────
 
 export type OutputFormat = 'markdown' | 'json' | 'yaml';
+
+// ─── MCP tool response type ────────────────────────────────────────────
+
+/** Return type for MCP tool handlers. Matches the SDK callback contract. */
+export interface ToolResponse {
+  [x: string]: unknown;
+  content: { type: 'text'; text: string }[];
+  isError?: boolean;
+}

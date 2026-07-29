@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { readFile } from 'node:fs/promises';
 import { writeFile } from 'node:fs/promises';
 import { runValuePipeline } from '../lib/transforms/registry.js';
+import type { ToolResponse } from '../lib/types.js';
 
 const EasyConvertSchema = z.object({
   value: z.unknown().optional().describe('The value to transform (inline). Use this for text/string values.'),
@@ -30,7 +31,7 @@ export async function resolveConvertValue(
 }
 
 /** Handle an easy_convert tool call. Exported for testing. */
-export async function handleEasyConvert(input: unknown): Promise<{ content: { type: string; text: string }[]; isError?: boolean }> {
+export async function handleEasyConvert(input: unknown): Promise<ToolResponse> {
   const parsed = EasyConvertSchema.safeParse(input);
   if (!parsed.success) {
     return {

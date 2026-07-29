@@ -2,6 +2,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import { normalizeInput } from '../lib/normalize.js';
 import { runGraph } from '../lib/engine.js';
+import type { ToolResponse } from '../lib/types.js';
 
 const EasyMungeSchema = z.object({
   path: z.string().describe('Path to the data file on disk (YAML, JSON, or CSV)'),
@@ -65,7 +66,7 @@ export function buildEasyMungePipeline(params: {
 }
 
 /** Handle an easy_munge tool call. Exported for testing. */
-export async function handleEasyMunge(input: unknown): Promise<{ content: { type: string; text: string }[]; isError?: boolean }> {
+export async function handleEasyMunge(input: unknown): Promise<ToolResponse> {
   const parsed = EasyMungeSchema.safeParse(input);
   if (!parsed.success) {
     return {

@@ -12,6 +12,22 @@ import { formatResult, resolveConvertValue, handleEasyConvert } from './easy-con
 
 registerAll();
 
+interface ToolResponse {
+  content: { type: string; text: string }[];
+  isError?: boolean;
+}
+
+/** Wrap handler to cast result so tests can access .content and .isError. */
+async function munge(input: Record<string, unknown>): Promise<ToolResponse> {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  return (await handleEasyMunge(input)) as ToolResponse;
+}
+
+async function convert(input: Record<string, unknown>): Promise<ToolResponse> {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  return (await handleEasyConvert(input)) as ToolResponse;
+}
+
 function tempFile(name: string, content: string): string {
   const dir = join(tmpdir(), 'data-munger-test-' + randomUUID());
   mkdirSync(dir, { recursive: true });
@@ -379,26 +395,26 @@ describe('easy_convert', () => {
 
   describe('handleEasyConvert handler', () => {
     it('returns error for invalid input', async () => {
-      const result = await handleEasyConvert({ bogus: true });
+      const result = await convert({ bogus: true });
       expect(result.isError).toBe(true);
       expect(result.content[0].text).toContain('Invalid input');
     });
 
     it('returns error when both value and path are missing', async () => {
-      const result = await handleEasyConvert({ transform: 'base64_encode' });
+      const result = await convert({ transform: 'base64_encode' });
       expect(result.isError).toBe(true);
       expect(result.content[0].text).toBe('Provide either "value" (inline) or "path" (file to read).');
     });
 
     it('transforms inline value', async () => {
-      const result = await handleEasyConvert({ value: 'hello', transform: 'base64_encode' });
+      const result = await convert({ value: 'hello', transform: 'base64_encode' });
       expect(result.isError).toBeFalsy();
       expect(result.content[0].text).toBe('aGVsbG8=');
     });
 
     it('transforms file contents', async () => {
       const path = tempFile('data.txt', 'hello world');
-      const result = await handleEasyConvert({ path, transform: 'base64_encode' });
+      const result = await convert({ path, transform: 'base64_encode' });
       expect(result.isError).toBeFalsy();
       expect(result.content[0].text).toBe('aGVsbG8gd29ybGQ=');
     });
@@ -407,7 +423,7 @@ describe('easy_convert', () => {
       const outDir = join(tmpdir(), 'data-munger-test-' + randomUUID());
       mkdirSync(outDir, { recursive: true });
       const outPath = join(outDir, 'out.txt');
-      const result = await handleEasyConvert({ value: 'hi', transform: 'base64_encode', outputPath: outPath });
+      const result = await convert({ value: 'hi', transform: 'base64_encode', outputPath: outPath });
       expect(result.isError).toBeFalsy();
       // Verify file was written
       const { readFile } = await import('node:fs/promises');
@@ -416,7 +432,7 @@ describe('easy_convert', () => {
     });
 
     it('returns error on invalid transform', async () => {
-      const result = await handleEasyConvert({ value: 'test', transform: 'nonexistent' });
+      const result = await convert({ value: 'test', transform: 'nonexistent' });
       expect(result.isError).toBe(true);
       expect(result.content[0].text).toContain('Unknown transform');
     });
@@ -427,13 +443,13 @@ describe('easy_convert', () => {
 
 describe('handleEasyMunge handler', () => {
   it('returns error for invalid input', async () => {
-    const result = await handleEasyMunge({ bogus: true });
+    const result = await munge({ bogus: true });
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain('Invalid input');
   });
 
   it('returns error for missing fields', async () => {
-    const result = await handleEasyMunge({
+    const result = await munge({
       path: '/some/file.yaml',
       jsonpath: '$.items[*]',
       fields: [],
@@ -445,7 +461,7 @@ describe('handleEasyMunge handler', () => {
 
   it('runs a successful pipeline', async () => {
     const path = tempFile('data.yaml', 'items:\n  - name: Alice\n  - name: Bob\n');
-    const result = await handleEasyMunge({
+    const result = await munge({
       path,
       jsonpath: '$.items[*]',
       fields: ['name'],
@@ -457,7 +473,7 @@ describe('handleEasyMunge handler', () => {
   });
 
   it('handles pipeline errors', async () => {
-    const result = await handleEasyMunge({
+    const result = await munge({
       path: '/nonexistent/file.yaml',
       jsonpath: '$.items[*]',
       fields: ['name'],
