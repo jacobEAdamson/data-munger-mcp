@@ -9,6 +9,8 @@ import { registerAll } from './lib/register.js';
 import { registerMungeTool } from './tools/munge.js';
 import { registerMungeGraphTool } from './tools/munge-graph.js';
 import { registerTransformValueTool } from './tools/transform-value.js';
+import { registerEasyMungeTool } from './tools/easy-munge.js';
+import { registerEasyConvertTool } from './tools/easy-convert.js';
 import { registerDescribeTransformsTool } from './tools/describe-transforms.js';
 import { registerDescribePipelineTool } from './tools/describe-pipeline.js';
 import { registerDescribeDataTool } from './tools/describe-data.js';
@@ -35,6 +37,8 @@ const server = new McpServer(
 registerMungeTool(server);
 registerMungeGraphTool(server);
 registerTransformValueTool(server);
+registerEasyMungeTool(server);
+registerEasyConvertTool(server);
 registerDescribeTransformsTool(server);
 registerDescribePipelineTool(server);
 registerDescribeDataTool(server);
