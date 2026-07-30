@@ -2,6 +2,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import { readFileSync } from 'node:fs';
 import { load as yamlLoad } from 'js-yaml';
+import { parseCsv } from '../lib/parse-csv.js';
 
 const DescribeDataSchema = z.object({
   data: z
@@ -54,21 +55,8 @@ export function loadFile(path: string, format?: string): unknown {
       return yamlLoad(raw);
     case 'json':
       return JSON.parse(raw);
-    case 'csv': {
-      const lines = raw
-        .trim()
-        .split('\n')
-        .map((l) => l.split(','));
-      const header = lines[0];
-      if (lines.length < 2) throw new Error('CSV file appears empty');
-      return lines.slice(1).map((r) => {
-        const obj: Record<string, string> = {};
-        header.forEach((h, i) => {
-          obj[h] = r[i] ?? '';
-        });
-        return obj;
-      });
-    }
+    case 'csv':
+      return parseCsv(raw, 'file');
     default:
       throw new Error(`Unsupported format: ${fmt}`);
   }

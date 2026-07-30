@@ -191,7 +191,7 @@ export type NodeHandler = (
 
 // ─── Output format ───────────────────────────────────────────────────
 
-export type OutputFormat = 'markdown' | 'json' | 'yaml';
+export type OutputFormat = 'markdown' | 'json' | 'yaml' | 'csv';
 
 // ─── MCP tool response type ────────────────────────────────────────────
 

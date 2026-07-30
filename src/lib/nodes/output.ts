@@ -4,10 +4,10 @@ import { dirname, resolve } from 'node:path';
 import type { NodeMeta } from '../engine.js';
 
 export const nodeMeta: NodeMeta = {
-  description: 'Format the result as markdown, JSON, or YAML. Optionally write to a file. End of pipeline.',
+  description: 'Format the result as markdown, JSON, YAML, or CSV. Optionally write to a file. End of pipeline.',
   inputSlots: [{ name: 'main', description: 'Any value (records, string, document)' }],
   config: {
-    format: { type: 'markdown | json | yaml', required: false, description: 'Output format (default: markdown)' },
+    format: { type: 'markdown | json | yaml | csv', required: false, description: 'Output format (default: markdown)' },
     path: { type: 'string', required: false, description: 'Optional file path to write output to' },
   },
 };
@@ -48,6 +48,9 @@ export function outputNode(
     case 'markdown':
       formatted = recordsToMarkdown(records);
       break;
+    case 'csv':
+      formatted = recordsToCsv(records);
+      break;
     default:
       throw new Error(`Unsupported output format: ${format}`);
   }
@@ -62,6 +65,33 @@ export function outputNode(
   }
 
   return formatted;
+}
+
+function recordsToCsv(rows: Record<string, unknown>[]): string {
+  if (rows.length === 0) return '';
+  const headers = Object.keys(rows[0]);
+
+  const csvCell = (v: unknown): string => {
+    if (v == null) return '';
+    if (typeof v === 'number') return String(v);
+    if (typeof v === 'boolean') return v ? 'true' : 'false';
+    if (v instanceof Date) return v.toISOString();
+    let str: string;
+    if (typeof v === 'object') {
+      str = JSON.stringify(v);
+    } else {
+      str = String(v);
+    }
+    // Escape: wrap in quotes if contains comma, quote, or newline
+    if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+      str = '"' + str.replace(/"/g, '""') + '"';
+    }
+    return str;
+  };
+
+  const headerLine = headers.join(',');
+  const dataLines = rows.map((r) => headers.map((h) => csvCell(r[h])).join(','));
+  return [headerLine, ...dataLines].join('\n');
 }
 
 function recordsToMarkdown(rows: Record<string, unknown>[]): string {

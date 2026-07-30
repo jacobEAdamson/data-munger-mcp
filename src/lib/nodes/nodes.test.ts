@@ -206,6 +206,58 @@ describe('output node', () => {
     const result = outputNode({ format: 'markdown' }, { main: [] });
     expect(result).toBe('(no records)');
   });
+
+  it('outputs CSV with simple values', () => {
+    const result = outputNode(
+      { format: 'csv' },
+      { main: [{ name: 'Alice', age: 30, active: true }, { name: 'Bob', age: 25, active: false }] },
+    );
+    expect(result).toBe('name,age,active\nAlice,30,true\nBob,25,false');
+  });
+
+  it('outputs CSV with null/undefined values', () => {
+    const result = outputNode(
+      { format: 'csv' },
+      { main: [{ name: 'Alice', score: null }, { name: 'Bob', score: undefined }] },
+    );
+    expect(result).toBe('name,score\nAlice,\nBob,');
+  });
+
+  it('outputs CSV with complex values as JSON', () => {
+    const result = outputNode(
+      { format: 'csv' },
+      { main: [{ name: 'Alice', tags: ['a', 'b'], meta: { role: 'dev' } }] },
+    );
+    // Complex values serialized as JSON in cell, quoted for CSV safety
+    expect(result).toBe('name,tags,meta\nAlice,"[""a"",""b""]","{""role"":""dev""}"');
+  });
+
+  it('outputs CSV with Date value', () => {
+    const result = outputNode(
+      { format: 'csv' },
+      { main: [{ event: 'start', date: new Date('2024-01-15T00:00:00.000Z') }] },
+    );
+    expect(result).toBe('event,date\nstart,2024-01-15T00:00:00.000Z');
+  });
+
+  it('handles empty records for CSV', () => {
+    const result = outputNode({ format: 'csv' }, { main: [] });
+    expect(result).toBe('');
+  });
+});
+
+describe('load_string CSV edge cases', () => {
+  it('throws on malformed CSV parse', () => {
+    expect(() => {
+      loadStringNode({ data: 'a,b\n1', format: 'csv' }, {});
+    }).toThrow('CSV parse error');
+  });
+
+  it('throws on empty CSV', () => {
+    expect(() => {
+      loadStringNode({ data: 'a,b', format: 'csv' }, {});
+    }).toThrow('CSV data appears empty');
+  });
 });
 
 describe('load format guessing', () => {

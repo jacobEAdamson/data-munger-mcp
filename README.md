@@ -188,7 +188,7 @@ Transforms work in `map` fields AND in `transform_value`. Chain them together �
 |--------|:----:|:------:|
 | JSON | ✓ | ✓ |
 | YAML | ✓ | ✓ |
-| CSV | ✓ | — |
+| CSV | ✓ | ✓ |
 
 ## Development
 

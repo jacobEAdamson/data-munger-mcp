@@ -1,4 +1,5 @@
 import { load as yamlLoad } from 'js-yaml';
+import { parseCsv } from '../parse-csv.js';
 import type { NodeMeta } from '../engine.js';
 
 export const nodeMeta: NodeMeta = {
@@ -22,21 +23,8 @@ export function loadStringNode(
       return yamlLoad(data);
     case 'json':
       return JSON.parse(data);
-    case 'csv': {
-      const lines = data
-        .trim()
-        .split('\n')
-        .map((l) => l.split(','));
-      const header = lines[0];
-      if (lines.length < 2) throw new Error('CSV data appears empty');
-      return lines.slice(1).map((r) => {
-        const obj: Record<string, string> = {};
-        header.forEach((h, i) => {
-          obj[h] = r[i] ?? '';
-        });
-        return obj;
-      });
-    }
+    case 'csv':
+      return parseCsv(data, 'data');
     default:
       throw new Error(`Unsupported format: ${format}`);
   }
