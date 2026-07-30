@@ -10,7 +10,7 @@ const EasyMungeSchema = z.object({
   jsonpath: z.string().describe('JSONPath expression to extract records from the loaded data (e.g. "$.items[*]")'),
   fields: z.array(z.string()).min(1).describe('Field names to extract from each record. Generates a jsonpath transform "$.<fieldName>" for each.'),
   fieldMapping: z.record(z.string(), z.string()).optional().describe('Override auto-generated jsonpaths: { label: jsonpath }. Merged with fields — matching keys override the jsonpath, new keys add extra fields.'),
-  template: z.string().optional().describe('Optional Liquid template to render each record. Context is { records: [...] }. Omit to get a formatted table.'),
+  template: z.string().optional().describe('Optional Liquid template to render each record. Use {{ field_name }} to reference mapped fields. Omit to get a formatted table.'),
   output: z.enum(['markdown', 'json', 'yaml', 'csv']).optional().default('markdown').describe('Output format (default: markdown)'),
   outputPath: z.string().optional().describe('Write output to a file on disk'),
 });
@@ -56,7 +56,7 @@ export function buildEasyMungePipeline(params: {
 
   // Optional template step
   if (template) {
-    pipeline.push({ template: { template } });
+    pipeline.push({ template: { template, perRecord: true } });
   }
 
   // Output step
