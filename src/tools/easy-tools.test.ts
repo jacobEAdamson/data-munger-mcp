@@ -66,13 +66,13 @@ describe('easy_munge pipeline', () => {
       path: 'data.yaml',
       jsonpath: '$.users[*]',
       fields: ['name'],
-      template: '{% for r in records %}{{r.name}}\n{% endfor %}',
+      template: '{{name}}',
       output: 'markdown',
     });
 
     expect(pipeline).toHaveLength(5); // load + records + map + template + output
     expect(pipeline[3]).toEqual({
-      template: { template: '{% for r in records %}{{r.name}}\n{% endfor %}' },
+      template: { template: '{{name}}', perRecord: true },
     });
   });
 
@@ -189,7 +189,7 @@ users:
       jsonpath: '$.users[*]',
       fields: ['Name', 'Email'],
       fieldMapping: { Name: 'name', Email: 'email' },
-      template: '{% for r in records %}{{r.Name}}: {{r.Email}}\n{% endfor %}',
+      template: '{{Name}}: {{Email}}',
       output: 'markdown',
     });
 
@@ -197,6 +197,108 @@ users:
     const result = await runGraph(nodes);
     expect(result.isError).toBe(false);
     expect(result.text).toContain('Alice: alice@example.com');
+  });
+
+  // ── Regression: issue #13 — template uses mapped fields ─────────────
+
+  it('renders template against mapped fields with simple labels', async () => {
+    const path = tempFile(
+      'data.yaml',
+      `
+items:
+  - user:
+      name: Alice
+      email: alice@example.com
+`,
+    );
+
+    const pipeline = buildEasyMungePipeline({
+      path,
+      jsonpath: '$.items[*]',
+      fields: ['name'],
+      fieldMapping: { name: 'user.name', email: 'user.email' },
+      template: '{{name}}: {{email}}',
+      output: 'json',
+    });
+
+    const nodes = normalizeInput({ pipeline });
+    const result = await runGraph(nodes);
+    expect(result.isError).toBe(false);
+    expect(result.text).toContain('Alice: alice@example.com');
+  });
+
+  it('renders template per-record with multiple records', async () => {
+    const path = tempFile(
+      'data.yaml',
+      `
+items:
+  - name: Alice
+    role: Dev
+  - name: Bob
+    role: QA
+`,
+    );
+
+    const pipeline = buildEasyMungePipeline({
+      path,
+      jsonpath: '$.items[*]',
+      fields: ['name', 'role'],
+      template: '{{name}} - {{role}}',
+      output: 'markdown',
+    });
+
+    const nodes = normalizeInput({ pipeline });
+    const result = await runGraph(nodes);
+    expect(result.isError).toBe(false);
+    // Each record rendered on its own line
+    expect(result.text).toContain('Alice - Dev');
+    expect(result.text).toContain('Bob - QA');
+  });
+
+  it('renders template with fieldMapping for nested paths', async () => {
+    // Users should use fieldMapping to map nested paths to simple labels
+    const path = tempFile(
+      'data.yaml',
+      `
+items:
+  - properties:
+      mag: 5.2
+      place: Tokyo
+`,
+    );
+
+    const pipeline = buildEasyMungePipeline({
+      path,
+      jsonpath: '$.items[*]',
+      fields: ['mag', 'place'],
+      fieldMapping: { mag: 'properties.mag', place: 'properties.place' },
+      template: '{{mag}} - {{place}}',
+      output: 'markdown',
+    });
+
+    const nodes = normalizeInput({ pipeline });
+    const result = await runGraph(nodes);
+    expect(result.isError).toBe(false);
+    expect(result.text).toContain('5.2');
+    expect(result.text).toContain('Tokyo');
+  });
+
+  it('handles template with empty records', async () => {
+    const path = tempFile('data.yaml', 'items: []');
+
+    const pipeline = buildEasyMungePipeline({
+      path,
+      jsonpath: '$.items[*]',
+      fields: ['name'],
+      template: '{{name}}',
+      output: 'markdown',
+    });
+
+    const nodes = normalizeInput({ pipeline });
+    const result = await runGraph(nodes);
+    expect(result.isError).toBe(false);
+    // Template renders per-record but no records → empty string
+    expect(result.text).toBe('');
   });
 
   it('outputs JSON when format is json', async () => {

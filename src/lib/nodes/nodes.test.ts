@@ -158,6 +158,60 @@ describe('template node', () => {
     );
     expect(result).toContain('Charlie');
   });
+
+  it('renders per-record when perRecord is true', () => {
+    const result = templateNode(
+      { template: '{{name}} - {{role}}', perRecord: true },
+      { main: [{ name: 'Alice', role: 'Dev' }, { name: 'Bob', role: 'QA' }] },
+    );
+    expect(result).toBe('Alice - Dev\nBob - QA');
+  });
+
+  it('strips $. prefix with perRecord mode', () => {
+    const result = templateNode(
+      { template: '{{$.name}}', perRecord: true },
+      { main: [{ name: 'Charlie' }] },
+    );
+    expect(result).toBe('Charlie');
+  });
+
+  // ── Regression: perRecord edge cases ───────────────────────────────
+
+  it('perRecord returns empty string for empty records', () => {
+    const result = templateNode(
+      { template: '{{name}}', perRecord: true },
+      { main: [] },
+    );
+    expect(result).toBe('');
+  });
+
+  it('perRecord renders single record correctly', () => {
+    const result = templateNode(
+      { template: 'Hello {{name}}', perRecord: true },
+      { main: [{ name: 'World' }] },
+    );
+    expect(result).toBe('Hello World');
+  });
+
+  it('perRecord handles dot-path field names', () => {
+    const result = templateNode(
+      { template: '{{properties.mag}} - {{properties.place}}', perRecord: true },
+      { main: [{ name: 'plain' }, { 'properties.mag': '5.2', 'properties.place': 'Tokyo' }] },
+    );
+    // First record: properties.mag → undefined, properties.place → undefined → empty fields
+    // Second record: Liquid interprets properties.mag as nested lookup, not dot-key
+    // So this test verifies that perRecord mode doesn't crash on dot-path keys
+    expect(result).toBe(' - \n - ');
+  });
+
+  it('perRecord does not affect default mode', () => {
+    // Default mode (perRecord: false) still wraps in { records: [...] }
+    const result = templateNode(
+      { template: '{{records[0].name}}' },
+      { main: [{ name: 'Alice' }] },
+    );
+    expect(result).toBe('Alice');
+  });
 });
 
 describe('output node', () => {
