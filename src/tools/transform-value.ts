@@ -41,7 +41,7 @@ export function registerTransformValueTool(server: McpServer): void {
       const { value, transforms } = parsed.data;
 
       try {
-        const result = runValuePipeline(transforms, {}, value);
+        const result = runValuePipeline(transforms, (value ?? {}) as Record<string, unknown>, value);
         return {
           content: [
             {

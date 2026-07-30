@@ -51,7 +51,7 @@ export async function handleEasyConvert(input: unknown): Promise<ToolResponse> {
 
   try {
     const resolvedValue = await resolveConvertValue(value, path);
-    const result = runValuePipeline([transform], {}, resolvedValue);
+    const result = runValuePipeline([transform], (resolvedValue ?? {}) as Record<string, unknown>, resolvedValue);
 
     // Write to file if requested
     if (outputPath) {

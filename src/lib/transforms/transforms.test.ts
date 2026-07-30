@@ -192,6 +192,24 @@ describe('jsonpath transform', () => {
     const result = runValuePipeline([{ jsonpath: '$.name' }], { name: 'Alice' });
     expect(result).toBe('Alice');
   });
+
+  it('extracts when record equals value (transform_value pattern)', () => {
+    const value = { name: 'test', nested: { key: 'val' } };
+    const result = runValuePipeline([{ jsonpath: '$.name' }], value, value);
+    expect(result).toBe('test');
+  });
+
+  it('extracts nested path when record equals value', () => {
+    const value = { user: { email: 'a@b.com' } };
+    const result = runValuePipeline([{ jsonpath: '$.user.email' }], value, value);
+    expect(result).toBe('a@b.com');
+  });
+
+  it('returns empty string for missing path', () => {
+    const value = { name: 'test' };
+    const result = runValuePipeline([{ jsonpath: '$.missing' }], value, value);
+    expect(result).toBe('');
+  });
 });
 
 describe('regex transform', () => {
