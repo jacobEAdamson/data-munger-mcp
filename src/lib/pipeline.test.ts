@@ -166,6 +166,36 @@ describe('engine edge cases', () => {
   });
 });
 
+describe('CSV load errors', () => {
+  it('handles malformed CSV file', async () => {
+    const path = tempFile('bad.csv', 'a,b\n1');
+    const nodes = normalizeInput({
+      pipeline: [
+        { load: { path } },
+        { records: { jsonpath: '$[*]' } },
+        { output: { format: 'json' } },
+      ],
+    });
+    const result = await runGraph(nodes);
+    expect(result.isError).toBe(true);
+    expect(result.text).toContain('CSV parse error');
+  });
+
+  it('handles empty CSV header-only file', async () => {
+    const path = tempFile('empty.csv', 'a,b');
+    const nodes = normalizeInput({
+      pipeline: [
+        { load: { path } },
+        { records: { jsonpath: '$[*]' } },
+        { output: { format: 'json' } },
+      ],
+    });
+    const result = await runGraph(nodes);
+    expect(result.isError).toBe(true);
+    expect(result.text).toContain('CSV file appears empty');
+  });
+});
+
 describe('inline data', () => {
   it('loads inline JSON and produces output', async () => {
     const nodes = normalizeInput({
