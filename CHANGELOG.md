@@ -8,7 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.4.0] - 2026-07-29
 
 ### Added
-- (describe your changes)
+- CSV output via `papaparse` — `output` node now supports `"csv"` format
+- `perRecord` option on `template` node — template renders per-record with record as top-level Liquid context
+
+### Fixed
+- `jsonpath` transform returns empty in `transform_value` and `easy_convert` — jp.value passed {} as record
+- `easy_munge` template now renders against mapped fields — `perRecord: true` enables direct field reference ({{field}})
 
 ## [1.3.0] - 2026-07-28
 
