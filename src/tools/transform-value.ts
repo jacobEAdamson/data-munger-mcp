@@ -7,7 +7,7 @@ const TransformStepSchema = z.union([
   z.record(z.string(), z.unknown()),
 ]);
 
-const TransformValueSchema = z.object({
+export const TransformValueSchema = z.object({
   value: z.unknown().describe('The input value to transform'),
   transforms: z
     .array(TransformStepSchema)

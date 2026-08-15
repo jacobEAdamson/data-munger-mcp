@@ -44,7 +44,7 @@ const PipelineStepSchema = z.union([
   z.object({ output: z.object({ format: z.enum(['markdown', 'json', 'yaml', 'csv']).optional(), path: z.string().optional() }) }),
 ]);
 
-const MungerInputSchema = z.object({
+export const MungerInputSchema = z.object({
   pipeline: z.array(PipelineStepSchema).min(1),
 });
 
