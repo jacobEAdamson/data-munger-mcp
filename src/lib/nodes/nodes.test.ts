@@ -212,6 +212,30 @@ describe('template node', () => {
     );
     expect(result).toBe('Alice');
   });
+
+  it('html_escape filter works in template', () => {
+    const result = templateNode(
+      { template: '{{ content | html_escape }}', perRecord: true },
+      { main: [{ content: '<tag> & "quote"' }] },
+    );
+    expect(result).toBe('&lt;tag&gt; &amp; &quot;quote&quot;');
+  });
+
+  it('html_unescape filter works in template', () => {
+    const result = templateNode(
+      { template: '{{ content | html_unescape }}', perRecord: true },
+      { main: [{ content: '&lt;tag&gt; &amp; &quot;quote&quot;' }] },
+    );
+    expect(result).toBe('<tag> & "quote"');
+  });
+
+  it('html_to_md filter works in template', () => {
+    const result = templateNode(
+      { template: '{{ content | html_to_md }}', perRecord: true },
+      { main: [{ content: '<strong>Bold</strong>' }] },
+    );
+    expect(result).toContain('**Bold**');
+  });
 });
 
 describe('output node', () => {

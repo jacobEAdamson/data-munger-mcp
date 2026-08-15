@@ -1,5 +1,7 @@
 import { Liquid } from 'liquidjs';
 import type { NodeMeta } from '../engine.js';
+import { htmlToMdTransform } from '../transforms/html_to_md.js';
+import { htmlEscapeTransform, htmlUnescapeTransform } from '../transforms/encode.js';
 
 export const nodeMeta: NodeMeta = {
   description: 'Render records through a Liquid template. Produces a string.',
@@ -11,6 +13,9 @@ export const nodeMeta: NodeMeta = {
 };
 
 const engine = new Liquid();
+engine.registerFilter('html_to_md', (value: unknown) => htmlToMdTransform(value, {}, undefined));
+engine.registerFilter('html_escape', (value: unknown) => htmlEscapeTransform(value, {}, undefined));
+engine.registerFilter('html_unescape', (value: unknown) => htmlUnescapeTransform(value, {}, undefined));
 
 /** Strip $. prefix from template variables so {{$.field}} → {{field}} */
 function stripDollar(tmpl: string): string {
