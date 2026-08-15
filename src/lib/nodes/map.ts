@@ -17,7 +17,7 @@ export const nodeMeta: NodeMeta = {
 export function mapNode(
   config: Record<string, unknown>,
   inputs: Record<string, unknown>,
-): Record<string, string>[] {
+): Record<string, unknown>[] {
   const fields = config.fields as {
     label: string;
     value: unknown[];
@@ -25,15 +25,14 @@ export function mapNode(
   const records = inputs.main as Record<string, unknown>[];
 
   return records.map((rec) => {
-    const row: Record<string, string> = {};
+    const row: Record<string, unknown> = {};
     for (const field of fields) {
       const result = runValuePipeline(field.value, rec);
-      row[field.label] =
-        result === undefined || result === null
-          ? ''
-          : typeof result === 'object'
-            ? JSON.stringify(result)
-            : String(result);
+      if (result === undefined || result === null) {
+        row[field.label] = '';
+      } else {
+        row[field.label] = result;
+      }
     }
     return row;
   });

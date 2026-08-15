@@ -59,7 +59,7 @@ const GraphNodeSchema = z.union([
   }),
   z.object({
     id: z.string(),
-    template: z.object({ from: z.string().optional(), template: z.string() }),
+    template: z.object({ from: z.string().optional(), template: z.string(), perRecord: z.boolean().optional() }),
   }),
   z.object({
     id: z.string(),

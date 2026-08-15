@@ -40,7 +40,7 @@ const PipelineStepSchema = z.union([
       ),
     }),
   }),
-  z.object({ template: z.object({ template: z.string() }) }),
+  z.object({ template: z.object({ template: z.string(), perRecord: z.boolean().optional() }) }),
   z.object({ output: z.object({ format: z.enum(['markdown', 'json', 'yaml', 'csv']).optional(), path: z.string().optional() }) }),
 ]);
 
