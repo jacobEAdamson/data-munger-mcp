@@ -33,7 +33,7 @@ function parseFrontmatter(
   content: string,
   filename: string,
 ): { meta: ExampleMeta; body: string } {
-  const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n/);
+  const frontmatterMatch = /^---\n([\s\S]*?)\n---\n/.exec(content);
 
   let name = filename.replace(/\.md$/, '');
   let description = '';
@@ -44,11 +44,11 @@ function parseFrontmatter(
     body = content.slice(frontmatterMatch[0].length);
 
     // Extract name (looks for "name: value")
-    const nameMatch = raw.match(/^name:\s*(.+)$/m);
+    const nameMatch = /^name:\s*(.+)$/m.exec(raw);
     if (nameMatch) name = nameMatch[1].trim();
 
     // Extract description
-    const descMatch = raw.match(/^description:\s*(.+)$/m);
+    const descMatch = /^description:\s*(.+)$/m.exec(raw);
     if (descMatch) description = descMatch[1].trim();
   }
 

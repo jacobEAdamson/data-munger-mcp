@@ -34,13 +34,12 @@ const examplesDir = resolve(__dirname, '../examples');
 
 /** Parse frontmatter name field from markdown content */
 function parseName(content: string, filename: string): string {
-  const m = content.match(/^---\n[\s\S]*?^name:\s*(.+)$/m);
+  const m = /^---\n[\s\S]*?^name:\s*(.+)$/m.exec(content);
   return m ? m[1].trim() : filename.replace(/\.md$/, '');
 }
 
-/** Extract tool name from `**Tool:** `tool_name`` line */
 function extractTool(content: string): string | null {
-  const m = content.match(/\*\*Tool:\*\*\s*`([a-z_]+)`/);
+  const m = /\*\*Tool:\*\*\s*`([a-z_]+)`/.exec(content);
   return m?.[1] ?? null;
 }
 
@@ -112,7 +111,7 @@ interface Example {
   jsonBlocks: string[];
 }
 
-const examples: Example[] = (() => {
+const examples = ((): Example[] => {
   let files: string[];
   try {
     files = readdirSync(examplesDir).filter((f) => f.endsWith('.md'));
@@ -136,8 +135,8 @@ describe('examples', () => {
     expect(examples.length).toBeGreaterThan(0);
   });
 
-  describe.each(examples)('$filename ($name)', (example) => {
-    const { filename, name, tool, jsonBlocks, content } = example;
+  describe.each(examples)('$filename ($name)', (_example) => {
+    const { filename: _filename, name, tool, jsonBlocks, content: _content } = _example;
 
     test('has a **Tool:** line identifying target tool', () => {
       expect(tool).not.toBeNull();
@@ -231,15 +230,13 @@ describe('examples', () => {
             value: unknown;
             transforms: unknown[];
           };
-          try {
+          expect(() => {
             runValuePipeline(
               transforms,
               (value ?? {}) as Record<string, unknown>,
               value,
             );
-          } catch (e) {
-            throw new Error(`transform_value failed: ${e instanceof Error ? e.message : String(e)}`);
-          }
+          }).not.toThrow();
         });
       }
     }
