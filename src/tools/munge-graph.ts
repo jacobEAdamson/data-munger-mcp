@@ -63,7 +63,7 @@ const GraphNodeSchema = z.union([
   }),
   z.object({
     id: z.string(),
-    output: z.object({ from: z.string().optional(), format: z.enum(['markdown', 'json', 'yaml']).optional(), path: z.string().optional() }),
+    output: z.object({ from: z.string().optional(), format: z.enum(['markdown', 'json', 'yaml', 'csv']).optional(), path: z.string().optional() }),
   }),
 ]);
 
