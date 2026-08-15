@@ -210,6 +210,31 @@ describe('jsonpath transform', () => {
     const result = runValuePipeline([{ jsonpath: '$.missing' }], value, value);
     expect(result).toBe('');
   });
+
+  it('accepts documented { path } config shape', () => {
+    const result = runValuePipeline([{ jsonpath: { path: '$.name' } }], { name: 'Alice' });
+    expect(result).toBe('Alice');
+  });
+
+  it('preserves extracted array for downstream template iteration', () => {
+    const record = { comments: [{ id: 1 }, { id: 2 }] };
+    const result = runValuePipeline([{ jsonpath: { path: '$.comments' } }], record);
+    expect(Array.isArray(result)).toBe(true);
+    expect(result).toHaveLength(2);
+    expect((result as {id: number}[])[0].id).toBe(1);
+  });
+
+  it('preserves extracted object for downstream template iteration', () => {
+    const record = { metadata: { author: 'Alice', date: '2024-01-15' } };
+    const result = runValuePipeline([{ jsonpath: { path: '$.metadata' } }], record);
+    expect(result).toEqual({ author: 'Alice', date: '2024-01-15' });
+  });
+
+  it('throws clear error for empty config', () => {
+    expect(() => runValuePipeline([{ jsonpath: {} }], { name: 'test' })).toThrow(
+      'config must be a string or { path } object',
+    );
+  });
 });
 
 describe('regex transform', () => {
