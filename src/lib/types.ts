@@ -74,7 +74,7 @@ export interface GroupConfig {
 
 export interface OutputConfig {
   from?: string;
-  format?: 'markdown' | 'json' | 'yaml';
+  format?: 'markdown' | 'json' | 'yaml' | 'csv';
   path?: string;
 }
 
