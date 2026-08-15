@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-08-15
+
+### Added
+- Examples tools: `examples_list` and `examples_show` — browse usage examples at runtime with drift protection
+- `build` job in CI — runs `npm run build`, replaces `typecheck` (compilation + copy-examples.mjs verification)
+
+### Fixed
+- `jsonpath` transform accepts `{ path }` config shape, preserves arrays/objects for downstream iteration
+- HTML transforms (`html_to_md`, `html_escape`, `html_unescape`) registered as Liquid filters in template node
+- `csv` format added to `munge`/`munge_graph` output schema
+- Usage examples added to `describe_transforms` for all transforms
+- `map` node preserves arrays/objects instead of `JSON.stringify` — enables `{{Skills | join: ", "}}` in templates
+- `perRecord` option added to template Zod schema in `munge` and `munge_graph` tools
+
 ## [1.4.0] - 2026-07-29
 
 ### Added
