@@ -3,9 +3,12 @@ import type { TransformFn, TransformMeta } from './registry.js';
 
 export const transformMeta: Record<string, TransformMeta> = {
   jsonpath: {
-    description: 'Extract a field from the current record using JSONPath',
-    configShape: { path: { type: 'string', required: true, description: 'JSONPath expression, e.g. $.name' } },
+    description: 'Extract a field from the current record using JSONPath. Accepts a bare string path or { path } object.',
+    configShape: {
+      path: { type: 'string', required: false, description: 'JSONPath expression, e.g. $.name. When config is a bare string, it is used as the path directly.' },
+    },
     entryPoint: true,
+    example: '{ "jsonpath": "$.name" }',
   },
 };
 

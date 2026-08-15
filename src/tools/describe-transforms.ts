@@ -34,6 +34,7 @@ export function registerDescribeTransformsTool(server: McpServer): void {
       const lines = filtered.map(({ name, meta }) => {
         let entry = `## ${name}\n${meta.description}\n`;
         if (meta.entryPoint) entry += `- entryPoint: true (accepts $.field references)\n`;
+        if (meta.example) entry += `- **Usage:** \`${meta.example}\`\n`;
         if (meta.configShape) {
           entry += `\n**Config:**\n`;
           for (const [key, val] of Object.entries(meta.configShape)) {

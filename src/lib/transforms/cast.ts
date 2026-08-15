@@ -3,14 +3,15 @@ import { toZonedTime } from 'date-fns-tz';
 import type { TransformFn, TransformMeta } from './registry.js';
 
 export const transformMeta: Record<string, TransformMeta> = {
-  to_number: { description: 'Parse string to number' },
-  to_string: { description: 'Convert value to string' },
+  to_number: { description: 'Parse string to number', example: '"to_number"' },
+  to_string: { description: 'Convert value to string', example: '"to_string"' },
   to_date: {
     description: 'Parse date string to Date object using date-fns',
     configShape: {
       input_format: { type: 'string', required: false, description: 'date-fns parse format string (e.g. "dd/MM/yyyy"). Omit or "ISO" for ISO 8601' },
       timezone: { type: 'string', required: false, description: 'IANA timezone (e.g. "America/New_York")' },
     },
+    example: '{ "to_date": { "input_format": "dd/MM/yyyy" } }',
   },
 };
 

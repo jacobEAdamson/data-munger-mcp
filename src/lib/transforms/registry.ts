@@ -25,6 +25,8 @@ export interface TransformMeta {
   >;
   /** Whether the transform accepts $.field references as its first argument. */
   entryPoint?: boolean;
+  /** Example usage snippet: shows the transform_value step entry the user would write. */
+  example?: string;
 }
 
 const metaRegistry = new Map<string, TransformMeta>();
