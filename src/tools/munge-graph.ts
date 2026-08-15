@@ -67,7 +67,7 @@ const GraphNodeSchema = z.union([
   }),
 ]);
 
-const MungerGraphInputSchema = z.object({
+export const MungerGraphInputSchema = z.object({
   nodes: z.array(GraphNodeSchema).min(1),
 });
 

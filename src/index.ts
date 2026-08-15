@@ -14,6 +14,7 @@ import { registerEasyConvertTool } from './tools/easy-convert.js';
 import { registerDescribeTransformsTool } from './tools/describe-transforms.js';
 import { registerDescribePipelineTool } from './tools/describe-pipeline.js';
 import { registerDescribeDataTool } from './tools/describe-data.js';
+import { registerExamplesTools } from './tools/examples.js';
 
 // Register all node handlers and value transforms
 registerAll();
@@ -42,6 +43,7 @@ registerEasyConvertTool(server);
 registerDescribeTransformsTool(server);
 registerDescribePipelineTool(server);
 registerDescribeDataTool(server);
+registerExamplesTools(server);
 
 const transport = new StdioServerTransport();
 await server.connect(transport);

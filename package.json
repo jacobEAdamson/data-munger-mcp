@@ -14,7 +14,7 @@
     "node": ">=18"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node scripts/copy-examples.mjs",
     "start": "node dist/index.js",
     "dev": "tsc --watch",
     "inspect": "npx @modelcontextprotocol/inspector node dist/index.js",
