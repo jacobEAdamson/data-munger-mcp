@@ -71,6 +71,10 @@ load ──▶ records ──┘
 
 Apply transforms to a value directly, no file loading needed. Use when you have a value in context and want to format, clean, or transform it — e.g. format a number, strip HTML, apply regex, convert date strings.
 
+### `examples_list` / `examples_show` — discover examples
+
+`examples_list` lists every ready-to-run example pipeline (name + description). `examples_show <name>` returns the full example as markdown, with the exact tool call to make. Use these to find a starting point when you're not sure which pipeline shape fits your data.
+
 ## Transforms
 
 Transforms work in `map` fields AND in `transform_value`. Chain them together — each step feeds the next.
@@ -101,86 +105,20 @@ Transforms work in `map` fields AND in `transform_value`. Chain them together �
 
 ## Examples
 
-### Quick report from a config file
+Ready-to-run example pipelines live in [`src/examples/`](src/examples/). Each is a markdown file with the tool call to make and the JSON you can paste straight in.
 
-```json
-{
-  "pipeline": [
-    { "load": { "path": "team.yaml" } },
-    { "records": { "jsonpath": "$.members[*]" } },
-    { "map": { "fields": [
-      { "label": "Name", "value": [{ "jsonpath": "$.name" }] },
-      { "label": "Role", "value": [{ "jsonpath": "$.role" }] },
-      { "label": "Skills", "value": [{ "jsonpath": "$.skills | join(', ')" }] }
-    ]}},
-    { "output": { "format": "markdown" } }
-  ]
-}
-```
+Inside Claude Code, use `examples_list` to see them, then `examples_show <name>` to load the full example:
 
-### Filter active items, sort, limit to top 10
-
-```json
-{
-  "pipeline": [
-    { "load": { "path": "data.yaml" } },
-    { "records": { "jsonpath": "$.items[?(@.status == 'active')]" } },
-    { "sort": { "by": "name" } },
-    { "limit": { "count": 10 } },
-    { "output": { "format": "markdown" } }
-  ]
-}
-```
-
-### Join users and orders into one report
-
-```json
-{
-  "nodes": [
-    { "id": "u",  "load": { "path": "users.yaml" } },
-    { "id": "o",  "load": { "path": "orders.yaml" } },
-    { "id": "r1", "records": { "from": "u", "jsonpath": "$.users[*]" } },
-    { "id": "r2", "records": { "from": "o", "jsonpath": "$.orders[*]" } },
-    { "id": "j",  "join": { "inputs": { "left": "r1", "right": "r2" }, "on": "user_id" } },
-    { "id": "m",  "map": { "from": "j", "fields": [
-      { "label": "Name", "value": [{ "jsonpath": "$.name" }] },
-      { "label": "Total", "value": [{ "jsonpath": "$.total" }, "to_number", { "format_number": { "decimals": 2, "prefix": "$" } }] }
-    ]}},
-    { "id": "out", "output": { "from": "m", "format": "markdown" } }
-  ]
-}
-```
-
-### Inline data — no file needed
-
-```json
-{
-  "pipeline": [
-    { "load_string": { "data": "{\"users\": [{\"name\": \"Alice\"}]}" } },
-    { "records": { "jsonpath": "$.users[*]" } },
-    { "map": { "fields": [
-      { "label": "Name", "value": [{ "jsonpath": "$.name" }] }
-    ]}},
-    { "output": { "format": "markdown" } }
-  ]
-}
-```
-
-### Group and aggregate
-
-```json
-{
-  "pipeline": [
-    { "load": { "path": "orders.json" } },
-    { "records": { "jsonpath": "$.orders[*]" } },
-    { "group": { "by": "status", "agg": [
-      { "field": "total", "op": "sum", "as": "total_revenue" },
-      { "field": "id", "op": "count", "as": "order_count" }
-    ]}},
-    { "output": { "format": "markdown" } }
-  ]
-}
-```
+| Example | Tool | What it shows |
+|---------|------|--------------|
+| `quick-report` | `munge` | Load YAML, extract records, map fields |
+| `filter-sort-limit` | `munge` | JSONPath filter, sort, limit to top N |
+| `group-aggregate` | `munge` | Group by field, aggregate (sum/count/avg/min/max) |
+| `inline-data` | `munge` | Inline data with `load_string`, no file needed |
+| `join-pipelines` | `munge_graph` | Join two sources on a key |
+| `easy-munge` | `easy_munge` | Simplified wrapper — path + jsonpath + fields |
+| `easy-convert` | `easy_convert` | Single transform on a value or file |
+| `transform-value` | `transform_value` | Chain transforms (dates, regex, encode) |
 
 ## Supported formats
 
