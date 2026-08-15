@@ -38,6 +38,7 @@ export const transformMeta: Record<string, TransformMeta> = {
       seconds: { type: 'number', required: false, description: 'Seconds to add' },
       timezone: { type: 'string', required: false, description: 'IANA timezone' },
     },
+    example: '{ "date_add": { "days": 10 } }',
   },
   date_diff: {
     description: 'Get difference between two dates in specified unit',
@@ -45,6 +46,7 @@ export const transformMeta: Record<string, TransformMeta> = {
       unit: { type: 'string', required: true, description: 'Unit: years, months, weeks, days, hours, minutes, seconds' },
       to: { type: 'string', required: false, description: 'Target date string or $.field reference. Defaults to comparing with current value' },
     },
+    example: '{ "date_diff": { "unit": "days", "to": "$.start" } }',
   },
   date_truncate: {
     description: 'Truncate date to start of specified unit',
@@ -52,6 +54,7 @@ export const transformMeta: Record<string, TransformMeta> = {
       unit: { type: 'string', required: true, description: 'Unit: year, month, week, day, hour, minute, second' },
       timezone: { type: 'string', required: false, description: 'IANA timezone' },
     },
+    example: '{ "date_truncate": { "unit": "month" } }',
   },
   date_tz: {
     description: 'Convert date between timezones',
@@ -59,6 +62,7 @@ export const transformMeta: Record<string, TransformMeta> = {
       target: { type: 'string', required: true, description: 'Target IANA timezone (e.g. "America/New_York")' },
       source: { type: 'string', required: false, description: 'Source IANA timezone if input is not UTC' },
     },
+    example: '{ "date_tz": { "target": "America/New_York" } }',
   },
 };
 

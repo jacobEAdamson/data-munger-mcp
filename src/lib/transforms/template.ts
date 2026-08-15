@@ -8,6 +8,7 @@ export const transformMeta: Record<string, TransformMeta> = {
     description: 'Render a Liquid template with $.field references from the record',
     configShape: { template: { type: 'string', required: true, description: 'Liquid template string, e.g. "Hello {{$.name}}"' } },
     entryPoint: true,
+    example: '{ "template": "Hello {{$.name}}" }',
   },
 };
 

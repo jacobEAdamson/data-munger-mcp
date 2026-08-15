@@ -6,6 +6,7 @@ export const transformMeta: Record<string, TransformMeta> = {
     description: 'Concatenate values with $.field references',
     configShape: { values: { type: 'string[]', required: true, description: 'Array of literal strings and $.field refs' } },
     entryPoint: true,
+    example: '{ "concat": { "values": ["prefix_", "$.field"] } }',
   },
 };
 

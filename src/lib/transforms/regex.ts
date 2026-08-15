@@ -7,6 +7,7 @@ export const transformMeta: Record<string, TransformMeta> = {
       pattern: { type: 'string', required: true, description: 'Regex pattern' },
       replace: { type: 'string', required: true, description: 'Replacement string' },
     },
+    example: '{ "regex": { "pattern": "\\\\d", "replace": "" } }',
   },
 };
 

@@ -1,12 +1,12 @@
 import type { TransformFn, TransformMeta } from './registry.js';
 
 export const transformMeta: Record<string, TransformMeta> = {
-  base64_encode: { description: 'Base64 encode a string' },
-  base64_decode: { description: 'Base64 decode a string' },
-  url_encode: { description: 'URL-encode a string (encodeURIComponent)' },
-  url_decode: { description: 'URL-decode a string (decodeURIComponent)' },
-  html_escape: { description: 'Escape HTML entities in string' },
-  html_unescape: { description: 'Unescape HTML entities in string' },
+  base64_encode: { description: 'Base64 encode a string', example: '"base64_encode"' },
+  base64_decode: { description: 'Base64 decode a string', example: '"base64_decode"' },
+  url_encode: { description: 'URL-encode a string (encodeURIComponent)', example: '"url_encode"' },
+  url_decode: { description: 'URL-decode a string (decodeURIComponent)', example: '"url_decode"' },
+  html_escape: { description: 'Escape HTML entities in string', example: '"html_escape"' },
+  html_unescape: { description: 'Unescape HTML entities in string', example: '"html_unescape"' },
 };
 
 export const base64EncodeTransform: TransformFn = (value) => {

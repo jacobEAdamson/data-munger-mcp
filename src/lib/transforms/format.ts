@@ -10,6 +10,7 @@ export const transformMeta: Record<string, TransformMeta> = {
       prefix: { type: 'string', required: false, description: 'Text prepended (e.g. "$")' },
       suffix: { type: 'string', required: false, description: 'Text appended (e.g. "%")' },
     },
+    example: '{ "format_number": { "decimals": 2, "prefix": "$" } }',
   },
   format_date: {
     description: 'Format Date to string using date-fns format tokens',
@@ -17,14 +18,17 @@ export const transformMeta: Record<string, TransformMeta> = {
       output_format: { type: 'string', required: true, description: 'date-fns format string (e.g. "yyyy-MM-dd", "MMMM do, yyyy")' },
       timezone: { type: 'string', required: false, description: 'IANA timezone (e.g. "America/New_York")' },
     },
+    example: '{ "format_date": { "output_format": "yyyy-MM-dd" } }',
   },
   round: {
     description: 'Round number to specified decimals',
     configShape: { decimals: { type: 'number', required: false, description: 'Decimal places (default 0)' } },
+    example: '{ "round": { "decimals": 1 } }',
   },
   truncate: {
     description: 'Truncate string to length, appending ellipsis',
     configShape: { length: { type: 'number', required: true, description: 'Max characters before truncation' } },
+    example: '{ "truncate": { "length": 5 } }',
   },
 };
 
