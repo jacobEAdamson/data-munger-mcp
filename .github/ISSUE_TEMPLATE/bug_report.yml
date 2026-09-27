@@ -1,0 +1,29 @@
+---
+name: Bug report
+about: Something isn't working
+title: ""
+labels: bug
+assignees: ""
+---
+
+## Description
+
+_What happened? What did you expect to happen?_
+
+## Reproduction
+
+_Input data or pipeline that triggers the bug:_
+
+```yaml
+# paste minimal example here
+```
+
+## Environment
+
+- data-munger-mcp version:
+- Node version:
+- MCP client (Claude Code, etc.):
+
+## Logs
+
+_Any error output or unexpected results:_
