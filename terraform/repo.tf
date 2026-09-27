@@ -25,3 +25,46 @@ resource "github_repository" "repo" {
   archived      = false
   is_template   = false
 }
+
+resource "github_branch_protection" "master" {
+  repository_id = github_repository.repo.node_id
+  pattern       = "master"
+
+  required_status_checks {
+    strict   = true
+    contexts = ["lint", "test (20)", "build"]
+  }
+
+  required_pull_request_reviews {
+    required_approving_review_count = 1
+    dismiss_stale_reviews           = true
+    require_code_owner_reviews      = false
+    restrict_dismissals             = false
+  }
+
+  enforce_admins = false
+
+  require_signed_commits           = false
+  required_linear_history          = false
+  allows_force_pushes              = false
+  allows_deletions                 = false
+  require_conversation_resolution  = false
+}
+
+resource "github_repository_ruleset" "protect_version_tags" {
+  name        = "Protect version tags"
+  target      = "tag"
+  enforcement = "active"
+  repository  = github_repository.repo.name
+
+  conditions {
+    ref_name {
+      include = ["refs/tags/v*"]
+      exclude = []
+    }
+  }
+
+  rules {
+    deletion = true
+  }
+}
