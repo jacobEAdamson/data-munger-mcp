@@ -1,0 +1,232 @@
+{
+  "version": 4,
+  "terraform_version": "1.16.4",
+  "serial": 3,
+  "lineage": "52ea0e80-6fa9-54ed-7d42-97445f5fe78c",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "github_actions_secret",
+      "name": "codecov",
+      "provider": "provider[\"registry.terraform.io/integrations/github\"]",
+      "instances": [
+        {
+          "schema_version": 2,
+          "attributes": {
+            "created_at": "2026-07-26 20:19:50 +0000 UTC",
+            "destroy_on_drift": null,
+            "encrypted_value": null,
+            "id": "data-munger-mcp:CODECOV_TOKEN",
+            "key_id": null,
+            "plaintext_value": null,
+            "remote_updated_at": "2026-07-26 20:19:50 +0000 UTC",
+            "repository": "data-munger-mcp",
+            "repository_id": 1312990843,
+            "secret_name": "CODECOV_TOKEN",
+            "updated_at": "2026-07-26 20:19:50 +0000 UTC",
+            "value": null,
+            "value_encrypted": null
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "encrypted_value"
+              }
+            ],
+            [
+              {
+                "type": "get_attr",
+                "value": "plaintext_value"
+              }
+            ],
+            [
+              {
+                "type": "get_attr",
+                "value": "value"
+              }
+            ],
+            [
+              {
+                "type": "get_attr",
+                "value": "value_encrypted"
+              }
+            ]
+          ],
+          "identity_schema_version": 0,
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjIifQ=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "github_issue_labels",
+      "name": "labels",
+      "provider": "provider[\"registry.terraform.io/integrations/github\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "data-munger-mcp",
+            "label": [
+              {
+                "color": "0075ca",
+                "description": "Improvements or additions to documentation",
+                "name": "documentation",
+                "url": "https://api.github.com/repos/jacobEAdamson/data-munger-mcp/labels/documentation"
+              },
+              {
+                "color": "008672",
+                "description": "Extra attention is needed",
+                "name": "help wanted",
+                "url": "https://api.github.com/repos/jacobEAdamson/data-munger-mcp/labels/help%20wanted"
+              },
+              {
+                "color": "0366d6",
+                "description": "Pull requests that update a dependency file",
+                "name": "dependencies",
+                "url": "https://api.github.com/repos/jacobEAdamson/data-munger-mcp/labels/dependencies"
+              },
+              {
+                "color": "168700",
+                "description": "Pull requests that update javascript code",
+                "name": "javascript",
+                "url": "https://api.github.com/repos/jacobEAdamson/data-munger-mcp/labels/javascript"
+              },
+              {
+                "color": "7057ff",
+                "description": "Good for newcomers",
+                "name": "good first issue",
+                "url": "https://api.github.com/repos/jacobEAdamson/data-munger-mcp/labels/good%20first%20issue"
+              },
+              {
+                "color": "a2eeef",
+                "description": "New feature or request",
+                "name": "enhancement",
+                "url": "https://api.github.com/repos/jacobEAdamson/data-munger-mcp/labels/enhancement"
+              },
+              {
+                "color": "cfd3d7",
+                "description": "This issue or pull request already exists",
+                "name": "duplicate",
+                "url": "https://api.github.com/repos/jacobEAdamson/data-munger-mcp/labels/duplicate"
+              },
+              {
+                "color": "d73a4a",
+                "description": "Something isn't working",
+                "name": "bug",
+                "url": "https://api.github.com/repos/jacobEAdamson/data-munger-mcp/labels/bug"
+              },
+              {
+                "color": "d876e3",
+                "description": "Further information is requested",
+                "name": "question",
+                "url": "https://api.github.com/repos/jacobEAdamson/data-munger-mcp/labels/question"
+              },
+              {
+                "color": "e4e669",
+                "description": "This doesn't seem right",
+                "name": "invalid",
+                "url": "https://api.github.com/repos/jacobEAdamson/data-munger-mcp/labels/invalid"
+              },
+              {
+                "color": "ffffff",
+                "description": "This will not be worked on",
+                "name": "wontfix",
+                "url": "https://api.github.com/repos/jacobEAdamson/data-munger-mcp/labels/wontfix"
+              }
+            ],
+            "repository": "data-munger-mcp"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjAifQ=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "github_repository",
+      "name": "repo",
+      "provider": "provider[\"registry.terraform.io/integrations/github\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "allow_auto_merge": true,
+            "allow_forking": true,
+            "allow_merge_commit": false,
+            "allow_rebase_merge": false,
+            "allow_squash_merge": true,
+            "allow_update_branch": false,
+            "archive_on_destroy": null,
+            "archived": false,
+            "auto_init": false,
+            "default_branch": "master",
+            "delete_branch_on_merge": false,
+            "description": "MCP server for data munging pipelines",
+            "etag": "W/\"33ea15bc18afeeb7497f94f7a8d6b4bf49584899661a4b78fb7faab1edf094e4\"",
+            "fork": "false",
+            "full_name": "jacobEAdamson/data-munger-mcp",
+            "git_clone_url": "git://github.com/jacobEAdamson/data-munger-mcp.git",
+            "gitignore_template": null,
+            "has_discussions": false,
+            "has_downloads": false,
+            "has_issues": true,
+            "has_projects": true,
+            "has_wiki": true,
+            "homepage_url": "",
+            "html_url": "https://github.com/jacobEAdamson/data-munger-mcp",
+            "http_clone_url": "https://github.com/jacobEAdamson/data-munger-mcp.git",
+            "id": "data-munger-mcp",
+            "ignore_vulnerability_alerts_during_read": null,
+            "is_template": false,
+            "license_template": null,
+            "merge_commit_message": "PR_TITLE",
+            "merge_commit_title": "MERGE_MESSAGE",
+            "name": "data-munger-mcp",
+            "node_id": "R_kgDOTkKmew",
+            "pages": [],
+            "primary_language": "TypeScript",
+            "private": false,
+            "repo_id": 1312990843,
+            "security_and_analysis": [
+              {
+                "advanced_security": [],
+                "code_security": [],
+                "secret_scanning": [
+                  {
+                    "status": "enabled"
+                  }
+                ],
+                "secret_scanning_ai_detection": [],
+                "secret_scanning_non_provider_patterns": [],
+                "secret_scanning_push_protection": [
+                  {
+                    "status": "enabled"
+                  }
+                ]
+              }
+            ],
+            "source_owner": "",
+            "source_repo": "",
+            "squash_merge_commit_message": "COMMIT_MESSAGES",
+            "squash_merge_commit_title": "COMMIT_OR_PR_TITLE",
+            "ssh_clone_url": "git@github.com:jacobEAdamson/data-munger-mcp.git",
+            "svn_url": "https://github.com/jacobEAdamson/data-munger-mcp",
+            "template": [],
+            "topics": [],
+            "visibility": "public",
+            "vulnerability_alerts": false,
+            "web_commit_signoff_required": false
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ=="
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

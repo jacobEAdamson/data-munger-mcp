@@ -1,5 +1,2 @@
-variable "codecov_token" {
-  type        = string
-  sensitive   = true
-  description = "CODECOV_TOKEN for codecov-action"
-}
+# No variables currently — all config is self-contained.
+# Add variables here for values that differ per-environment.
