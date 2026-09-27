@@ -1,0 +1,19 @@
+---
+name: Feature request
+about: Suggest a new transform, tool, or improvement
+title: ""
+labels: enhancement
+assignees: ""
+---
+
+## Problem
+
+_What can't you do currently? What workflow is missing?_
+
+## Proposed solution
+
+_Describe the transform, tool, or change you want._
+
+## Example
+
+_Input → desired output:_

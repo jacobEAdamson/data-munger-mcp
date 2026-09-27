@@ -4,8 +4,8 @@ resource "github_repository" "repo" {
   visibility  = "public"
 
   has_issues      = true
-  has_projects    = true
-  has_wiki        = true
+  has_projects    = false
+  has_wiki        = false
   has_discussions = false
 
   topics = []
@@ -45,10 +45,10 @@ resource "github_branch_protection" "master" {
   enforce_admins = false
 
   require_signed_commits           = false
-  required_linear_history          = false
+  required_linear_history          = true
   allows_force_pushes              = false
   allows_deletions                 = false
-  require_conversation_resolution  = false
+  require_conversation_resolution  = true
 }
 
 resource "github_repository_ruleset" "protect_version_tags" {
